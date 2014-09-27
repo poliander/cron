@@ -1,6 +1,7 @@
 ## PHP Cron Expression Parser
 
 [![Build Status](https://travis-ci.org/poliander/cron.svg?branch=master)](https://travis-ci.org/poliander/cron)
+[![Coverage Status](https://img.shields.io/coveralls/poliander/cron.svg)](https://coveralls.io/r/poliander/cron)
 
 Standard (V7) compatible crontab expression parser/validator with support for time zones. See "[man 5 crontab](http://www.unix.com/man-page/linux/5/crontab/)" for possible expressions.
 
