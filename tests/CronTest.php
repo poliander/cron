@@ -1,15 +1,17 @@
 <?php
 
-require_once __DIR__ . '/../src/Cron.php';
+namespace Cron;
 
-class CronTest extends \PHPUnit_Framework_TestCase
+require_once __DIR__ . '/../src/Cron/Parser.php';
+
+class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider parserTestProvider
      */
     public function testParser($expression, $valid = false, $dtime = 'now', $matching = false)
     {
-        $ct = new Cron($expression, new \DateTimeZone('Europe/Berlin'));
+        $ct = new Parser($expression, new \DateTimeZone('Europe/Berlin'));
         $dt = new \DateTime($dtime, new \DateTimeZone('Europe/Berlin'));
 
         $this->assertEquals($valid, $ct->valid());
@@ -109,7 +111,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
      */
     public function testCalculateNext($expression, $timestamp, $nextmatch)
     {
-        $ct = new Cron($expression, new \DateTimeZone('Europe/Berlin'));
+        $ct = new Parser($expression, new \DateTimeZone('Europe/Berlin'));
         $this->assertEquals($ct->next($timestamp), $nextmatch);
     }
 

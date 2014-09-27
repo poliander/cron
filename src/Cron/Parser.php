@@ -1,11 +1,13 @@
 <?php
 
+namespace Cron;
+
 /**
  * Cron expression parser and validator
  *
  * @author René Pollesch
  */
-class Cron
+class Parser
 {
     /**
      * Weekday look-up table
