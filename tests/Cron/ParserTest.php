@@ -2,8 +2,6 @@
 
 namespace Cron;
 
-require_once __DIR__ . '/../src/Cron/Parser.php';
-
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
