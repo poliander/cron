@@ -7,9 +7,12 @@ php:
   - hhvm
 
 before_script:
-    - composer self-update && composer install --dev
+  - curl -s http://getcomposer.org/installer | php
+  - php composer.phar install --dev --no-interaction
 
-script: ./tests/travis.sh
+script:
+  - mkdir -p build/logs
+  - php vendor/bin/phpunit -c phpunit.xml.dist
 
 after_script:
-    - php vendor/bin/coveralls -v
+  - php vendor/bin/coveralls
