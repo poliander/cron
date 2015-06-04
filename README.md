@@ -1,5 +1,6 @@
 ## PHP Cron Expression Parser
 
+[![GPL v3](http://img.shields.io/:license-gpl3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0-standalone.html)
 [![Build Status](https://travis-ci.org/poliander/cron.svg?branch=master)](https://travis-ci.org/poliander/cron)
 [![Coverage Status](https://img.shields.io/coveralls/poliander/cron.svg)](https://coveralls.io/r/poliander/cron)
 
