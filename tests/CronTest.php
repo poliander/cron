@@ -130,10 +130,10 @@ class CronTest extends \PHPUnit_Framework_TestCase
 
     public function testGetNextWithDateTime()
     {
-        $cron = new Cron('45 9 * * *');
-        $dt = new DateTime('2014-05-18 08:45');
+        $cron = new Cron('45 9 * * *', new DateTimeZone('Europe/Berlin'));
+        $dt = new DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
 
-        $this->assertEquals(1400396400, $cron->getNext($dt));
+        $this->assertEquals(1400399100, $cron->getNext($dt));
     }
 
     public function testGetNextWithoutParameter()
