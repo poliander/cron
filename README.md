@@ -18,8 +18,8 @@ $isValid = $cron->isValid(); // returns true
 
 Check whether given date/time matches a cron expression:
 ```php
-$cron = new Cron('45 9 * * *', new \DateTimeZone('Europe/Berlin'));
-$dt = new \DateTime('2014-05-18 08:45', new \DateTimeZone('Europe/London'));
+$cron = new Cron('45 9 * * *', new DateTimeZone('Europe/Berlin'));
+$dt = new DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
 $isMatching = $cron->isMatching($dt); // returns true
 ```
 
