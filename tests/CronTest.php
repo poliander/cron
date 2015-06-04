@@ -105,19 +105,40 @@ class CronTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider calculateNextProvider
+     * @dataProvider getNextProvider
      */
-    public function testCalculateNext($expression, $timestamp, $nextmatch)
+    public function testGetNext($expression, $timestamp, $nextmatch)
     {
         $ct = new Cron($expression, new \DateTimeZone('Europe/Berlin'));
         $this->assertEquals($ct->getNext($timestamp), $nextmatch);
     }
 
-    public function calculateNextProvider()
+    public function getNextProvider()
     {
         return array(
             array('* * 13 * fri', 1400407467, 1402610400),
             array('*/15 * * * *', 1400407520, 1400408100)
         );
+    }
+
+    public function testIsMatchingWithDateTime()
+    {
+        $cron = new Cron('45 9 * * *', new DateTimeZone('Europe/Berlin'));
+        $dt = new DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
+        $this->assertEquals(true, $cron->isMatching($dt));
+    }
+
+    public function testGetNextWithDateTime()
+    {
+        $cron = new Cron('45 9 * * *');
+        $dt = new DateTime('2014-05-18 08:45');
+
+        $this->assertEquals(1400396400, $cron->getNext($dt));
+    }
+
+    public function testGetNextWithoutParameter()
+    {
+        $cron = new Cron('* * * * *');
+        $this->assertEquals(time() + (60 - time() % 60), $cron->getNext());
     }
 }
