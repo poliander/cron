@@ -139,6 +139,6 @@ class CronTest extends \PHPUnit_Framework_TestCase
     public function testGetNextWithoutParameter()
     {
         $cron = new Cron('* * * * *');
-        $this->assertEquals(time() + (60 - time() % 60), $cron->getNext());
+        $this->assertEquals(ceil(time() / 60) * 60, $cron->getNext());
     }
 }
