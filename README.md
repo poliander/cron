@@ -12,19 +12,19 @@ Standard (V7) compatible crontab expression parser/validator with support for ti
 Validate a cron expression:
 
 ```php
-$cron = new \Cron\Parser('15,45 */2 * * *');
-$valid = $cron->valid(); // returns true
+$cron = new \Cron('15,45 */2 * * *');
+$isValid = $cron->isValid(); // returns true
 ```
 
 Check whether given date/time matches a cron expression:
 ```php
 $cron = new \Cron\Parser('45 9 * * *', new \DateTimeZone('Europe/Berlin'));
 $dt = new \DateTime('2014-05-18 08:45', new \DateTimeZone('Europe/London'));
-$matching = $cron->matching($dt); // returns true
+$isMatching = $cron->isMatching($dt); // returns true
 ```
 
-Calculate timestamp for next Friday, the 13th:
+Calculate next timestamp matching a Friday, the 13th:
 ```php
 $cron = new \Cron\Parser('* * 13 * fri');
-$next = $cron->next();
+$ts = $cron->getNext();
 ```

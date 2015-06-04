@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<phpunit bootstrap="./tests/bootstrap.php" colors="true">
+<phpunit>
     <testsuites>
         <testsuite name="Cron Test Suite">
             <directory>tests</directory>

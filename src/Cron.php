@@ -1,13 +1,11 @@
 <?php
 
-namespace Cron;
-
 /**
  * Cron expression parser and validator
  *
  * @author René Pollesch
  */
-class Parser
+class Cron
 {
     /**
      * Weekday look-up table
@@ -108,7 +106,7 @@ class Parser
      *
      * @return bool true if expression is valid, or false on error
      */
-    public function valid()
+    public function isValid()
     {
         $result = true;
 
@@ -252,11 +250,11 @@ class Parser
      * @param mixed $dtime \DateTime object, timestamp or null
      * @return bool
      */
-    public function matching($dtime = null)
+    public function isMatching($dtime = null)
     {
         $result = false;
 
-        if ($this->valid()) {
+        if ($this->isValid()) {
             if ($dtime instanceof \DateTime) {
                 $dt = $dtime;
                 $dt->setTimeZone($this->timeZone);
@@ -292,11 +290,11 @@ class Parser
      * @param mixed $dtime \DateTime object, timestamp or null
      * @return int|bool next matching timestamp, or false on error
      */
-    public function next($dtime = null)
+    public function getNext($dtime = null)
     {
         $result = false;
 
-        if ($this->valid()) {
+        if ($this->isValid()) {
             if ($dtime instanceof \DateTime) {
                 $timestamp = $dtime->getTimestamp();
             } elseif ((int)$dtime > 0) {
