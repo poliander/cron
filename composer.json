@@ -1,24 +1,24 @@
 {
-    "name": "poliander/cron",
-    "type": "library",
-    "homepage": "https://github.com/poliander/cron",
-    "license": "GPL-3.0",
-    "authors": [
-        {
-            "name": "René Pollesch",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": ">=5.4.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "4.1.*",
-        "satooshi/php-coveralls": "dev-master"
-    },
-    "autoload": {
-        "psr-0": {
-            "Cron": "src"
-        }
+  "name": "poliander/cron",
+  "type": "library",
+  "homepage": "https://github.com/poliander/cron",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "René Pollesch",
+      "role": "Developer"
     }
+  ],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.1.*",
+    "satooshi/php-coveralls": "dev-master"
+  },
+  "autoload": {
+    "files": [
+      "src/Cron.php"
+    ]
+  }
 }
