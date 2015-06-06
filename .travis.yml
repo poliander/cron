@@ -7,8 +7,9 @@ php:
   - 7
 
 before_script:
+  - mkdir -p vendor
   - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev --no-interaction
+  - php composer.phar install --no-interaction
 
 script:
   - mkdir -p build/logs
