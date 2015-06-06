@@ -12,7 +12,7 @@ class Cron
      *
      * @var array
      */
-    protected static $weekdays = array(
+    protected static $weekdays = [
         'sun' => 0,
         'mon' => 1,
         'tue' => 2,
@@ -20,14 +20,14 @@ class Cron
         'thu' => 4,
         'fri' => 5,
         'sat' => 6
-    );
+    ];
 
     /**
      * Month name look-up table
      *
      * @var array
      */
-    protected static $months = array(
+    protected static $months = [
         'jan' => 1,
         'feb' => 2,
         'mar' => 3,
@@ -40,7 +40,7 @@ class Cron
         'oct' => 10,
         'nov' => 11,
         'dec' => 12
-    );
+    ];
 
     /**
      * Cron expression
@@ -114,11 +114,11 @@ class Cron
             if (sizeof($segments = preg_split('/\s+/', $this->expression)) !== 5) {
                 $result = false;
             } else {
-                $register = array();
+                $register = [];
 
-                $minv = array(0, 0, 1, 1, 0);
-                $maxv = array(59, 23, 31, 12, 7);
-                $strv = array(false, false, false, self::$months, self::$weekdays);
+                $minv = [0, 0, 1, 1, 0];
+                $maxv = [59, 23, 31, 12, 7];
+                $strv = [false, false, false, self::$months, self::$weekdays];
 
                 foreach ($segments as $s => $segment) {
 
@@ -329,7 +329,7 @@ class Cron
                     $dt->setTime($hour, 0);
                 }
 
-                list($pday, $pmonth, $pyear, $phour) = array($day, $month, $year, $hour);
+                list($pday, $pmonth, $pyear, $phour) = [$day, $month, $year, $hour];
 
                 if (isset($this->register[3][$month]) === false) {
                     $dt->modify('+1 month');
