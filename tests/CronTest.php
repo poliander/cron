@@ -141,4 +141,13 @@ class CronTest extends \PHPUnit_Framework_TestCase
         $cron = new Cron('* * * * *');
         $this->assertEquals(ceil(time() / 60) * 60, $cron->getNext());
     }
+
+    public function testGetNextWithTimestamp()
+    {
+        $tz = new DateTimezone('Europe/Berlin');
+        $dt = new DateTime('2014-12-31 23:42', $tz);
+        $cron = new Cron('45 9 29 feb thu', $tz);
+
+        $this->assertEquals(1709196300, $cron->getNext($dt->getTimestamp()));
+    }
 }

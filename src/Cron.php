@@ -121,7 +121,6 @@ class Cron
                 $strv = [false, false, false, self::$months, self::$weekdays];
 
                 foreach ($segments as $s => $segment) {
-
                     // month names, weekdays
                     if ($strv[$s] !== false && isset($strv[$s][strtolower($segment)])) {
                         // cannot be used with lists or ranges, see crontab(5) man page
@@ -130,8 +129,7 @@ class Cron
                     }
 
                     // split up list into segments (e.g. "1,3-5,9")
-                    foreach (explode(',', $segment) as $l => $listsegment) {
-
+                    foreach (explode(',', $segment) as $listsegment) {
                         // parse steps notation
                         if (strpos($listsegment, '/') !== false) {
                             if (sizeof($stepsegments = explode('/', $listsegment)) === 2) {
@@ -191,7 +189,7 @@ class Cron
                             }
 
                             // validate range
-                            foreach ($ranges as $r => $range) {
+                            foreach ($ranges as $range) {
                                 if (is_numeric($range)) {
                                     if (intval($range) < $minv[$s] || intval($range) > $maxv[$s]) {
                                         // start or end value is out of allowed range
@@ -255,29 +253,27 @@ class Cron
         $result = false;
 
         if ($this->isValid()) {
+            $result = true;
+
             if ($dtime instanceof \DateTime) {
-                $dt = $dtime;
-                $dt->setTimeZone($this->timeZone);
+                $dtime->setTimezone($this->timeZone);
             } else {
                 $dt = new \DateTime('now', $this->timeZone);
 
                 if ((int)$dtime > 0) {
                     $dt->setTimestamp($dtime);
                 }
+
+                $dtime = $dt;
             }
 
-            list($minute, $hour, $day, $month, $weekday) = sscanf(
-                $dt->format('i G j n w'),
-                '%d %d %d %d %d'
-            );
+            $segments = sscanf($dtime->format('i G j n w'), '%d %d %d %d %d');
 
-            if (isset($this->register[4][(int)$weekday]) &&
-                isset($this->register[3][(int)$month]) &&
-                isset($this->register[2][(int)$day]) &&
-                isset($this->register[1][(int)$hour]) &&
-                isset($this->register[0][(int)$minute])) {
-
-                $result = true;
+            foreach ($this->register as $i => $item) {
+                if (isset($item[(int)$segments[$i]]) === false) {
+                    $result = false;
+                    break;
+                }
             }
         }
 
