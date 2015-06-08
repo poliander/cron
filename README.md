@@ -30,3 +30,11 @@ $ts = $cron->getNext();
 ```
 
 ### Installation
+
+Using composer, include a dependency for `poliander/cron` in your `composer.json` file:
+
+```
+"require": {
+    "poliander/cron": "dev-master"
+}
+```
