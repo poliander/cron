@@ -28,3 +28,5 @@ Calculate next timestamp matching a Friday, the 13th:
 $cron = new Cron('* * 13 * fri');
 $ts = $cron->getNext();
 ```
+
+### Installation
