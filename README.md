@@ -12,7 +12,7 @@ Standard (V7) compliant crontab expression parser/validator with support for tim
 Using composer, include a dependency for `poliander/cron` in your `composer.json` file:
 ```
 "require": {
-    "poliander/cron": "dev-master"
+    "poliander/cron": "1.*"
 }
 ```
 
