@@ -7,8 +7,8 @@
     </testsuites>
 
     <filter>
-        <blacklist>
-            <directory suffix=".php">tests</directory>
-        </blacklist>
+        <whitelist>
+            <directory>src</directory>
+        </whitelist>
     </filter>
 </phpunit>
