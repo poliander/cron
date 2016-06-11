@@ -158,23 +158,37 @@ class Cron
     public function isMatching($dtime = null)
     {
         if (false === ($dtime instanceof \DateTime)) {
-            $dtime = \DateTime::createFromFormat('U', $dtime);
+            $dt = new \DateTime();
+            $dt->setTimestamp($dtime === null ? time() : $dtime);
+
+            $dtime = $dt;
         }
 
         $dtime->setTimezone($this->timeZone);
-        $segments = sscanf($dtime->format('i G j n w'), '%d %d %d %d %d');
 
         try {
-            $result = true;
-
-            foreach ($this->parse() as $i => $item) {
-                if (isset($item[(int)$segments[$i]]) === false) {
-                    $result = false;
-                    break;
-                }
-            }
+            $result = $this->match(sscanf($dtime->format('i G j n w'), '%d %d %d %d %d'));
         } catch (\Exception $e) {
             $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $segments
+     * @return bool
+     * @throws \Exception
+     */
+    private function match(array $segments)
+    {
+        $result = true;
+
+        foreach ($this->parse() as $i => $item) {
+            if (isset($item[(int)$segments[$i]]) === false) {
+                $result = false;
+                break;
+            }
         }
 
         return $result;
