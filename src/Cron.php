@@ -350,7 +350,7 @@ class Cron
             throw new \Exception('failed to parse list segment');
         }
 
-        $this->parseValues($index, $register, $range, $stepping);
+        $this->fillRegister($index, $register, $range, $stepping);
     }
 
     /**
@@ -380,14 +380,16 @@ class Cron
      * @param array $range
      * @param int $stepping
      */
-    private function parseValues($index, array &$register, array $range, $stepping)
+    private function fillRegister($index, array &$register, array $range, $stepping)
     {
         for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
-            if (($i - $range[0]) % $stepping !== 0) {
-                continue;
+            if (($i - $range[0]) % $stepping === 0) {
+                if ($range[0] < $range[1]) {
+                    $this->fillRegisterBetweenBoundaries($index, $register, $range, $i);
+                } else {
+                    $this->fillRegisterAcrossBoundaries($index, $register, $range, $i);
+                }
             }
-
-            $this->parseValue($index, $register, $range, $i);
         }
     }
 
@@ -397,16 +399,22 @@ class Cron
      * @param array $range
      * @param int $value
      */
-    private function parseValue($index, array &$register, array $range, $value)
+    private function fillRegisterAcrossBoundaries($index, array &$register, $range, $value)
     {
-        $lower = $value >= $range[0];
-        $upper = $value <= $range[1];
-
-        if ($range[0] < $range[1] && ($lower && $upper)) {
+        if ($value >= $range[0] || $value <= $range[1]) {
             $register[$index][$value] = true;
         }
+    }
 
-        if ($range[0] > $range[1] && ($lower || $upper)) {
+    /**
+     * @param int $index
+     * @param array $register
+     * @param array $range
+     * @param int $value
+     */
+    private function fillRegisterBetweenBoundaries($index, array &$register, $range, $value)
+    {
+        if ($value >= $range[0] && $value <= $range[1]) {
             $register[$index][$value] = true;
         }
     }
