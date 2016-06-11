@@ -129,31 +129,31 @@ class Cron
      */
     public function isMatching($dtime = null)
     {
-        $result = false;
+        if ($dtime instanceof \DateTime) {
+            $dtime->setTimezone($this->timeZone);
+        } else {
+            $dt = new \DateTime('now', $this->timeZone);
 
-        if ($this->isValid()) {
-            $result = true;
-
-            if ($dtime instanceof \DateTime) {
-                $dtime->setTimezone($this->timeZone);
-            } else {
-                $dt = new \DateTime('now', $this->timeZone);
-
-                if ((int)$dtime > 0) {
-                    $dt->setTimestamp($dtime);
-                }
-
-                $dtime = $dt;
+            if ((int)$dtime > 0) {
+                $dt->setTimestamp($dtime);
             }
 
-            $segments = sscanf($dtime->format('i G j n w'), '%d %d %d %d %d');
+            $dtime = $dt;
+        }
 
-            foreach ($this->registers as $i => $item) {
+        $segments = sscanf($dtime->format('i G j n w'), '%d %d %d %d %d');
+
+        try {
+            $result = true;
+
+            foreach ($this->parse() as $i => $item) {
                 if (isset($item[(int)$segments[$i]]) === false) {
                     $result = false;
                     break;
                 }
             }
+        } catch (\Exception $e) {
+            $result = false;
         }
 
         return $result;
