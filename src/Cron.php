@@ -160,13 +160,8 @@ class Cron
         if ($dtime instanceof \DateTime) {
             $dtime->setTimezone($this->timeZone);
         } else {
-            $dt = new \DateTime('now', $this->timeZone);
-
-            if ((int)$dtime > 0) {
-                $dt->setTimestamp($dtime);
-            }
-
-            $dtime = $dt;
+            $dtime = \DateTime::createFromFormat('U', $dtime);
+            $dtime->setTimezone($this->timeZone);
         }
 
         $segments = sscanf($dtime->format('i G j n w'), '%d %d %d %d %d');
