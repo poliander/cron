@@ -157,13 +157,11 @@ class Cron
      */
     public function isMatching($dtime = null)
     {
-        if ($dtime instanceof \DateTime) {
-            $dtime->setTimezone($this->timeZone);
-        } else {
+        if (false === ($dtime instanceof \DateTime)) {
             $dtime = \DateTime::createFromFormat('U', $dtime);
-            $dtime->setTimezone($this->timeZone);
         }
 
+        $dtime->setTimezone($this->timeZone);
         $segments = sscanf($dtime->format('i G j n w'), '%d %d %d %d %d');
 
         try {
