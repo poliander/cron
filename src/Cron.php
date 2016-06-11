@@ -130,6 +130,84 @@ class Cron
     }
 
     /**
+     * Calculate next matching timestamp
+     *
+     * @param mixed $dtime \DateTime object, timestamp or null
+     * @return int|bool next matching timestamp, or false on error
+     */
+    public function getNext($dtime = null)
+    {
+        $result = false;
+
+        if ($this->isValid()) {
+            if ($dtime instanceof \DateTime) {
+                $timestamp = $dtime->getTimestamp();
+            } elseif ((int)$dtime > 0) {
+                $timestamp = $dtime;
+            } else {
+                $timestamp = time();
+            }
+
+            $dt = new \DateTime('now', $this->timeZone);
+            $dt->setTimestamp(ceil($timestamp / 60) * 60);
+
+            $pointer = sscanf($dt->format('G j n Y'), '%d %d %d %d');
+
+            while ($this->forward($dt, $pointer)) {
+            }
+
+            $result = $dt->getTimestamp();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param \DateTime $dt
+     * @param array $pointer
+     * @return bool
+     */
+    private function forward(\DateTime $dt, array &$pointer)
+    {
+        $result = false;
+
+        list($minute, $hour, $day, $month, $year, $weekday) = sscanf(
+            $dt->format('i G j n Y w'),
+            '%d %d %d %d %d %d'
+        );
+
+        if ($pointer[3] !== $year) {
+            $dt->setDate($year, 1, 1);
+            $dt->setTime(0, 0);
+        } elseif ($pointer[2] !== $month) {
+            $dt->setDate($year, $month, 1);
+            $dt->setTime(0, 0);
+        } elseif ($pointer[1] !== $day) {
+            $dt->setTime(0, 0);
+        } elseif ($pointer[0] !== $hour) {
+            $dt->setTime($hour, 0);
+        }
+
+        $pointer = [$hour, $day, $month, $year];
+
+        if (isset($this->register[3][$month]) === false) {
+            $dt->modify('+1 month');
+            $result = true;
+        } elseif (false === (isset($this->register[2][$day]) && isset($this->register[4][$weekday]))) {
+            $dt->modify('+1 day');
+            $result = true;
+        } elseif (isset($this->register[1][$hour]) === false) {
+            $dt->modify('+1 hour');
+            $result = true;
+        } elseif (isset($this->register[0][$minute]) === false) {
+            $dt->modify('+1 minute');
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
      * Parse and validate cron expression
      *
      * @return bool true if expression is valid, or false on error
@@ -188,74 +266,6 @@ class Cron
             if (isset($item[(int)$segments[$i]]) === false) {
                 $result = false;
                 break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Calculate next matching timestamp
-     *
-     * @param mixed $dtime \DateTime object, timestamp or null
-     * @return int|bool next matching timestamp, or false on error
-     */
-    public function getNext($dtime = null)
-    {
-        $result = false;
-
-        if ($this->isValid()) {
-            if ($dtime instanceof \DateTime) {
-                $timestamp = $dtime->getTimestamp();
-            } elseif ((int)$dtime > 0) {
-                $timestamp = $dtime;
-            } else {
-                $timestamp = time();
-            }
-
-            $dt = new \DateTime('now', $this->timeZone);
-            $dt->setTimestamp(ceil($timestamp / 60) * 60);
-
-            list($pday, $pmonth, $pyear, $phour) = sscanf(
-                $dt->format('j n Y G'),
-                '%d %d %d %d'
-            );
-
-            while ($result === false) {
-                list($minute, $hour, $day, $month, $year, $weekday) = sscanf(
-                    $dt->format('i G j n Y w'),
-                    '%d %d %d %d %d %d'
-                );
-
-                if ($pyear !== $year) {
-                    $dt->setDate($year, 1, 1);
-                    $dt->setTime(0, 0);
-                } elseif ($pmonth !== $month) {
-                    $dt->setDate($year, $month, 1);
-                    $dt->setTime(0, 0);
-                } elseif ($pday !== $day) {
-                    $dt->setTime(0, 0);
-                } elseif ($phour !== $hour) {
-                    $dt->setTime($hour, 0);
-                }
-
-                list($pday, $pmonth, $pyear, $phour) = [$day, $month, $year, $hour];
-
-                if (isset($this->register[3][$month]) === false) {
-                    $dt->modify('+1 month');
-                    continue;
-                } elseif (false === (isset($this->register[2][$day]) && isset($this->register[4][$weekday]))) {
-                    $dt->modify('+1 day');
-                    continue;
-                } elseif (isset($this->register[1][$hour]) === false) {
-                    $dt->modify('+1 hour');
-                    continue;
-                } elseif (isset($this->register[0][$minute]) === false) {
-                    $dt->modify('+1 minute');
-                    continue;
-                }
-
-                $result = $dt->getTimestamp();
             }
         }
 
@@ -361,6 +371,24 @@ class Cron
     }
 
     /**
+     * Parse stepping notation, e.g. "5-10/2" => 2
+     *
+     * @param int $index
+     * @param string $element
+     * @param int $stepping
+     * @throws \Exception
+     */
+    private function parseStepping($index, &$element, &$stepping)
+    {
+        $segments = explode('/', $element);
+
+        $this->validateStepping($index, $segments);
+
+        $element = (string)$segments[0];
+        $stepping = (int)$segments[1];
+    }
+
+    /**
      * Validate whether a given range of values exceeds allowed value boundaries
      *
      * @param int $index
@@ -379,6 +407,38 @@ class Cron
         }
 
         return $range;
+    }
+    /**
+     * @param int $index
+     * @param int $value
+     * @throws \Exception
+     */
+    private function validateValue($index, $value)
+    {
+        if (is_numeric($value)) {
+            if (intval($value) < self::$boundaries[$index]['min'] ||
+                intval($value) > self::$boundaries[$index]['max']) {
+                throw new \Exception('value boundary exceeded');
+            }
+        } else {
+            throw new \Exception('non-integer value');
+        }
+    }
+
+    /**
+     * @param int $index
+     * @param array $segments
+     * @throws \Exception
+     */
+    private function validateStepping($index, array $segments)
+    {
+        if (sizeof($segments) !== 2) {
+            throw new \Exception('invalid stepping notation');
+        }
+
+        if ((int)$segments[1] <= 0 || (int)$segments[1] > self::$boundaries[$index]['max']) {
+            throw new \Exception('stepping out of allowed range');
+        }
     }
 
     /**
@@ -423,57 +483,6 @@ class Cron
     {
         if ($value >= $range[0] && $value <= $range[1]) {
             $register[$index][$value] = true;
-        }
-    }
-
-    /**
-     * @param int $index
-     * @param int $value
-     * @throws \Exception
-     */
-    private function validateValue($index, $value)
-    {
-        if (is_numeric($value)) {
-            if (intval($value) < self::$boundaries[$index]['min'] ||
-                intval($value) > self::$boundaries[$index]['max']) {
-                throw new \Exception('value boundary exceeded');
-            }
-        } else {
-            throw new \Exception('non-integer value');
-        }
-    }
-
-    /**
-     * Parse stepping notation, e.g. "5-10/2" => 2
-     *
-     * @param int $index
-     * @param string $element
-     * @param int $stepping
-     * @throws \Exception
-     */
-    private function parseStepping($index, &$element, &$stepping)
-    {
-        $segments = explode('/', $element);
-
-        $this->validateStepping($index, $segments);
-
-        $element = (string)$segments[0];
-        $stepping = (int)$segments[1];
-    }
-
-    /**
-     * @param int $index
-     * @param array $segments
-     * @throws \Exception
-     */
-    private function validateStepping($index, array $segments)
-    {
-        if (sizeof($segments) !== 2) {
-            throw new \Exception('invalid stepping notation');
-        }
-
-        if ((int)$segments[1] <= 0 || (int)$segments[1] > self::$boundaries[$index]['max']) {
-            throw new \Exception('stepping out of allowed range');
         }
     }
 }
