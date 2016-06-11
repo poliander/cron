@@ -8,7 +8,7 @@
 
 Standard (V7) compliant crontab expression parser/validator with support for time zones; see "[man 5 crontab](http://www.unix.com/man-page/linux/5/crontab/)" for possible expressions.
 
-### Installation
+#### Installation
 
 Using composer, include a dependency for `poliander/cron` in your `composer.json` file:
 ```
@@ -17,7 +17,7 @@ Using composer, include a dependency for `poliander/cron` in your `composer.json
 }
 ```
 
-### Examples
+#### Examples
 
 Validate a cron expression:
 ```php
@@ -37,3 +37,10 @@ Calculate next timestamp matching a Friday, the 13th:
 $cron = new Cron('* * 13 * fri');
 $ts = $cron->getNext();
 ```
+
+#### Changelog
+
+| version | release notes |
+| ------- | ------------- |
+| 1.0.0 (2015-06-20) | initial release |
+
