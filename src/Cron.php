@@ -304,16 +304,16 @@ class Cron
 
     /**
      * @param int $index
-     * @param string $element
      * @param array $register
+     * @param string $element
      * @throws \Exception
      */
     private function parseElement($index, array &$register, $element)
     {
-        if (false === strpos($element, '/')) {
-            $stepping = 1;
-        } else {
-            $stepping = $this->parseStepping($index, $element);
+        $stepping = 1;
+
+        if (false !== strpos($element, '/')) {
+            $this->parseStepping($index, $element, $stepping);
         }
 
         if (is_numeric($element)) {
@@ -348,57 +348,7 @@ class Cron
             throw new \Exception('failed to parse list segment');
         }
 
-        $this->parseValues($index, $register, $range, $stepping);
-    }
-
-    /**
-     * @param int $index
-     * @param array $register
-     * @param array $range
-     * @param int $stepping
-     */
-    private function parseValues($index, array &$register, array $range, $stepping)
-    {
-        for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
-            if (($i - $range[0]) % $stepping === 0) {
-                if ($range[0] < $range[1]) {
-                    if ($i >= $range[0] && $i <= $range[1]) {
-                        $register[$index][$i] = true;
-                    }
-                } elseif ($i >= $range[0] || $i <= $range[1]) {
-                    $register[$index][$i] = true;
-                }
-            }
-        }
-    }
-
-    /**
-     * Parse stepping notation, e.g. "/2"
-     *
-     * @param int $index
-     * @param string $element
-     * @return int
-     * @throws \Exception
-     */
-    private function parseStepping($index, &$element)
-    {
-        if (sizeof($segments = explode('/', $element)) === 2) {
-            $element = $segments[0];
-
-            if (is_numeric($segments[1])) {
-                if ($segments[1] > 0 && $segments[1] <= self::$boundaries[$index]['max']) {
-                    $stepping = $segments[1];
-                } else {
-                    throw new \Exception('stepping value out of allowed range');
-                }
-            } else {
-                throw new \Exception('non-numeric stepping notation');
-            }
-        } else {
-            throw new \Exception('invalid stepping notation');
-        }
-
-        return $stepping;
+        $this->parseValue($index, $register, $range, $stepping);
     }
 
     /**
@@ -424,6 +374,27 @@ class Cron
 
     /**
      * @param int $index
+     * @param array $register
+     * @param array $range
+     * @param int $stepping
+     */
+    private function parseValue($index, array &$register, array $range, $stepping)
+    {
+        for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
+            if (($i - $range[0]) % $stepping === 0) {
+                if ($range[0] < $range[1]) {
+                    if ($i >= $range[0] && $i <= $range[1]) {
+                        $register[$index][$i] = true;
+                    }
+                } elseif ($i >= $range[0] || $i <= $range[1]) {
+                    $register[$index][$i] = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param int $index
      * @param int $value
      * @throws \Exception
      */
@@ -436,6 +407,43 @@ class Cron
             }
         } else {
             throw new \Exception('non-integer value');
+        }
+    }
+
+    /**
+     * Parse stepping notation, e.g. "5-10/2" => 2
+     *
+     * @param int $index
+     * @param string $element
+     * @throws \Exception
+     */
+    private function parseStepping($index, &$element, &$stepping)
+    {
+        $segments = explode('/', $element);
+
+        $this->validateStepping($index, $segments);
+
+        $element = $segments[0];
+        $stepping = $segments[1];
+    }
+
+    /**
+     * @param int $index
+     * @param array $segments
+     * @throws \Exception
+     */
+    private function validateStepping($index, array $segments)
+    {
+        if (sizeof($segments) !== 2) {
+            throw new \Exception('invalid stepping notation');
+        }
+
+        if (false === is_numeric($segments[1])) {
+            throw new \Exception('non-numeric stepping notation');
+        }
+
+        if ($segments[1] <= 0 || $segments[1] > self::$boundaries[$index]['max']) {
+            throw new \Exception('stepping value out of allowed range');
         }
     }
 }
