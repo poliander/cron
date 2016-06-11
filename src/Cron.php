@@ -270,7 +270,9 @@ class Cron
                 $this->parseSegment($index, $register, $segment);
             }
 
-            $register[4][0] = isset($register[4][7]);
+            if (isset($register[4][7])) {
+                $register[4][0] = true;
+            }
         } else {
             throw new \Exception('invalid number of segments');
         }
@@ -397,11 +399,14 @@ class Cron
      */
     private function parseValue($index, array &$register, array $range, $value)
     {
-        if ($range[0] < $range[1]) {
-            if ($value >= $range[0] && $value <= $range[1]) {
-                $register[$index][$value] = true;
-            }
-        } elseif ($value >= $range[0] || $value <= $range[1]) {
+        $lower = $value >= $range[0];
+        $upper = $value <= $range[1];
+
+        if ($range[0] < $range[1] && ($lower && $upper)) {
+            $register[$index][$value] = true;
+        }
+
+        if ($range[0] > $range[1] && ($lower || $upper)) {
             $register[$index][$value] = true;
         }
     }
