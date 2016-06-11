@@ -415,6 +415,7 @@ class Cron
      *
      * @param int $index
      * @param string $element
+     * @param int $stepping
      * @throws \Exception
      */
     private function parseStepping($index, &$element, &$stepping)
@@ -423,8 +424,8 @@ class Cron
 
         $this->validateStepping($index, $segments);
 
-        $element = $segments[0];
-        $stepping = $segments[1];
+        $element = (string)$segments[0];
+        $stepping = (int)$segments[1];
     }
 
     /**
@@ -438,12 +439,8 @@ class Cron
             throw new \Exception('invalid stepping notation');
         }
 
-        if (false === is_numeric($segments[1])) {
-            throw new \Exception('non-numeric stepping notation');
-        }
-
-        if ($segments[1] <= 0 || $segments[1] > self::$boundaries[$index]['max']) {
-            throw new \Exception('stepping value out of allowed range');
+        if ((int)$segments[1] <= 0 || (int)$segments[1] > self::$boundaries[$index]['max']) {
+            throw new \Exception('stepping out of allowed range');
         }
     }
 }
