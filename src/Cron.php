@@ -153,8 +153,9 @@ class Cron
 
             $pointer = sscanf($dt->format('G j n Y'), '%d %d %d %d');
 
-            while ($this->forward($dt, $pointer)) {
-            }
+            do {
+                $current = $this->adjust($dt, $pointer);
+            } while ($this->forward($dt, $current));
 
             $result = $dt->getTimestamp();
         }
@@ -163,45 +164,54 @@ class Cron
     }
 
     /**
-     * @param \DateTime $dt
+     * @param \DateTime $dtime
      * @param array $pointer
-     * @return bool
+     * @return array
      */
-    private function forward(\DateTime $dt, array &$pointer)
+    private function adjust(\DateTime $dtime, array &$pointer)
     {
-        $result = false;
+        $current = sscanf($dtime->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-        list($minute, $hour, $day, $month, $year, $weekday) = sscanf(
-            $dt->format('i G j n Y w'),
-            '%d %d %d %d %d %d'
-        );
-
-        if ($pointer[3] !== $year) {
-            $dt->setDate($year, 1, 1);
-            $dt->setTime(0, 0);
-        } elseif ($pointer[2] !== $month) {
-            $dt->setDate($year, $month, 1);
-            $dt->setTime(0, 0);
-        } elseif ($pointer[1] !== $day) {
-            $dt->setTime(0, 0);
-        } elseif ($pointer[0] !== $hour) {
-            $dt->setTime($hour, 0);
+        if ($pointer[3] !== $current[4]) {
+            $pointer[3] = $current[4];
+            $dtime->setDate($current[4], 1, 1);
+            $dtime->setTime(0, 0);
+        } elseif ($pointer[2] !== $current[3]) {
+            $pointer[2] = $current[3];
+            $dtime->setDate($current[4], $current[3], 1);
+            $dtime->setTime(0, 0);
+        } elseif ($pointer[1] !== $current[2]) {
+            $pointer[1] = $current[2];
+            $dtime->setTime(0, 0);
+        } elseif ($pointer[0] !== $current[1]) {
+            $pointer[0] = $current[1];
+            $dtime->setTime($current[1], 0);
         }
 
-        $pointer = [$hour, $day, $month, $year];
+        return $current;
+    }
 
-        if (isset($this->register[3][$month]) === false) {
-            $dt->modify('+1 month');
+    /**
+     * @param \DateTime $dtime
+     * @param array $current
+     * @return bool
+     */
+    private function forward(\DateTime $dtime, array $current)
+    {
+        if (isset($this->register[3][$current[3]]) === false) {
+            $dtime->modify('+1 month');
             $result = true;
-        } elseif (false === (isset($this->register[2][$day]) && isset($this->register[4][$weekday]))) {
-            $dt->modify('+1 day');
+        } elseif (false === (isset($this->register[2][$current[2]]) && isset($this->register[4][$current[5]]))) {
+            $dtime->modify('+1 day');
             $result = true;
-        } elseif (isset($this->register[1][$hour]) === false) {
-            $dt->modify('+1 hour');
+        } elseif (isset($this->register[1][$current[1]]) === false) {
+            $dtime->modify('+1 hour');
             $result = true;
-        } elseif (isset($this->register[0][$minute]) === false) {
-            $dt->modify('+1 minute');
+        } elseif (isset($this->register[0][$current[0]]) === false) {
+            $dtime->modify('+1 minute');
             $result = true;
+        } else {
+            $result = false;
         }
 
         return $result;
