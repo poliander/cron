@@ -310,9 +310,12 @@ class Cron
      */
     private function parseElement($index, array &$register, $element)
     {
-        $stepping = $this->parseStepping($index, $element);
+        if (false === strpos($element, '/')) {
+            $stepping = 1;
+        } else {
+            $stepping = $this->parseStepping($index, $element);
+        }
 
-        // single value
         if (is_numeric($element)) {
             $this->validateValue($index, $element);
 
@@ -322,15 +325,7 @@ class Cron
 
             $register[$index][intval($element)] = true;
         } else {
-            if ($element === '*') {
-                $range = [self::$boundaries[$index]['min'], self::$boundaries[$index]['max']];
-            } elseif (strpos($element, '-') !== false) {
-                $range = explode('-', $element);
-            } else {
-                throw new \Exception('failed to parse list segment');
-            }
-
-            $this->parseRange($index, $register, $range, $stepping);
+            $this->parseRange($index, $register, $element, $stepping);
         }
     }
 
@@ -339,26 +334,39 @@ class Cron
      *
      * @param int $index
      * @param array $register
-     * @param array $range
+     * @param string $range
      * @param int $stepping
      * @throws \Exception
      */
-    private function parseRange($index, array &$register, array $range, $stepping)
+    private function parseRange($index, array &$register, $range, $stepping)
     {
-        $this->validateRange($index, $range);
-
-        if ($range[0] === $range[1]) {
-            $register[$index][$range[0]] = true;
+        if ($range === '*') {
+            $range = [self::$boundaries[$index]['min'], self::$boundaries[$index]['max']];
+        } elseif (strpos($range, '-') !== false) {
+            $range = $this->validateRange($index, explode('-', $range));
         } else {
-            for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
-                if (($i - $range[0]) % $stepping === 0) {
-                    if ($range[0] < $range[1]) {
-                        if ($i >= $range[0] && $i <= $range[1]) {
-                            $register[$index][$i] = true;
-                        }
-                    } elseif ($i >= $range[0] || $i <= $range[1]) {
+            throw new \Exception('failed to parse list segment');
+        }
+
+        $this->parseValues($index, $register, $range, $stepping);
+    }
+
+    /**
+     * @param int $index
+     * @param array $register
+     * @param array $range
+     * @param int $stepping
+     */
+    private function parseValues($index, array &$register, array $range, $stepping)
+    {
+        for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
+            if (($i - $range[0]) % $stepping === 0) {
+                if ($range[0] < $range[1]) {
+                    if ($i >= $range[0] && $i <= $range[1]) {
                         $register[$index][$i] = true;
                     }
+                } elseif ($i >= $range[0] || $i <= $range[1]) {
+                    $register[$index][$i] = true;
                 }
             }
         }
@@ -374,24 +382,20 @@ class Cron
      */
     private function parseStepping($index, &$element)
     {
-        $stepping = 1;
+        if (sizeof($segments = explode('/', $element)) === 2) {
+            $element = $segments[0];
 
-        if (strpos($element, '/') !== false) {
-            if (sizeof($segments = explode('/', $element)) === 2) {
-                $element = $segments[0];
-
-                if (is_numeric($segments[1])) {
-                    if ($segments[1] > 0 && $segments[1] <= self::$boundaries[$index]['max']) {
-                        $stepping = $segments[1];
-                    } else {
-                        throw new \Exception('stepping value out of allowed range');
-                    }
+            if (is_numeric($segments[1])) {
+                if ($segments[1] > 0 && $segments[1] <= self::$boundaries[$index]['max']) {
+                    $stepping = $segments[1];
                 } else {
-                    throw new \Exception('non-numeric stepping notation');
+                    throw new \Exception('stepping value out of allowed range');
                 }
             } else {
-                throw new \Exception('invalid stepping notation');
+                throw new \Exception('non-numeric stepping notation');
             }
+        } else {
+            throw new \Exception('invalid stepping notation');
         }
 
         return $stepping;
@@ -402,6 +406,7 @@ class Cron
      *
      * @param int $index
      * @param array $range
+     * @return array
      * @throws \Exception
      */
     private function validateRange($index, array $range)
@@ -413,6 +418,8 @@ class Cron
         foreach ($range as $value) {
             $this->validateValue($index, $value);
         }
+
+        return $range;
     }
 
     /**
