@@ -279,12 +279,14 @@ class Cron
     }
 
     /**
+     * Parse one segment of a cron expression
+     *
      * @param int $index
      * @param string $segment
      * @param array $register
      * @throws \Exception
      */
-    private function parseSegment($index, &$register, $segment)
+    private function parseSegment($index, array &$register, $segment)
     {
         $strv = [false, false, false, self::$months, self::$weekdays];
 
@@ -312,10 +314,7 @@ class Cron
 
         // single value
         if (is_numeric($element)) {
-            if (intval($element) < self::$boundaries[$index]['min'] ||
-                intval($element) > self::$boundaries[$index]['max']) {
-                throw new \Exception('value out of allowed range');
-            }
+            $this->validateValue($index, $element);
 
             if ($stepping !== 1) {
                 throw new \Exception('invalid combination of value and stepping notation');
@@ -336,6 +335,8 @@ class Cron
     }
 
     /**
+     * Parse range of values, e.g. "5-10"
+     *
      * @param int $index
      * @param array $register
      * @param array $range
@@ -346,7 +347,6 @@ class Cron
     {
         $this->validateRange($index, $range);
 
-        // fill matching register
         if ($range[0] === $range[1]) {
             $register[$index][$range[0]] = true;
         } else {
@@ -365,31 +365,8 @@ class Cron
     }
 
     /**
-     * Validate range of values
+     * Parse stepping notation, e.g. "/2"
      *
-     * @param int $index
-     * @param array $range
-     * @throws \Exception
-     */
-    private function validateRange($index, array $range)
-    {
-        if (sizeof($range) !== 2) {
-            throw new \Exception('invalid range notation');
-        }
-
-        foreach ($range as $value) {
-            if (is_numeric($value)) {
-                if (intval($value) < self::$boundaries[$index]['min'] ||
-                    intval($value) > self::$boundaries[$index]['max']) {
-                    throw new \Exception('invalid range start or end value');
-                }
-            } else {
-                throw new \Exception('non-numeric range notation');
-            }
-        }
-    }
-
-    /**
      * @param int $index
      * @param string $element
      * @return int
@@ -399,14 +376,13 @@ class Cron
     {
         $stepping = 1;
 
-        // parse stepping notation
         if (strpos($element, '/') !== false) {
-            if (sizeof($stepsegments = explode('/', $element)) === 2) {
-                $element = $stepsegments[0];
+            if (sizeof($segments = explode('/', $element)) === 2) {
+                $element = $segments[0];
 
-                if (is_numeric($stepsegments[1])) {
-                    if ($stepsegments[1] > 0 && $stepsegments[1] <= self::$boundaries[$index]['max']) {
-                        $stepping = intval($stepsegments[1]);
+                if (is_numeric($segments[1])) {
+                    if ($segments[1] > 0 && $segments[1] <= self::$boundaries[$index]['max']) {
+                        $stepping = $segments[1];
                     } else {
                         throw new \Exception('stepping value out of allowed range');
                     }
@@ -419,5 +395,40 @@ class Cron
         }
 
         return $stepping;
+    }
+
+    /**
+     * Validate whether a given range of values exceeds allowed value boundaries
+     *
+     * @param int $index
+     * @param array $range
+     * @throws \Exception
+     */
+    private function validateRange($index, array $range)
+    {
+        if (sizeof($range) !== 2) {
+            throw new \Exception('invalid range notation');
+        }
+
+        foreach ($range as $value) {
+            $this->validateValue($index, $value);
+        }
+    }
+
+    /**
+     * @param int $index
+     * @param int $value
+     * @throws \Exception
+     */
+    private function validateValue($index, $value)
+    {
+        if (is_numeric($value)) {
+            if (intval($value) < self::$boundaries[$index]['min'] ||
+                intval($value) > self::$boundaries[$index]['max']) {
+                throw new \Exception('value boundary exceeded');
+            }
+        } else {
+            throw new \Exception('non-integer value');
+        }
     }
 }
