@@ -235,11 +235,9 @@ class Cron
      */
     private function parse()
     {
-        $registers = null;
+        $registers = [];
 
         if (sizeof($segments = preg_split('/\s+/', $this->expression)) === 5) {
-            $registers = [];
-
             $minv = [0, 0, 1, 1, 0];
             $maxv = [59, 23, 31, 12, 7];
             $strv = [false, false, false, self::$months, self::$weekdays];
