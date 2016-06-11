@@ -230,66 +230,83 @@ class Cron
     /**
      * Parse cron expression and return expression parsed into matchable registers
      *
-     * @throws \Exception
      * @return array
+     * @throws \Exception
      */
     private function parse()
     {
         $registers = [];
 
         if (sizeof($segments = preg_split('/\s+/', $this->expression)) === 5) {
-            $minv = [0, 0, 1, 1, 0];
-            $maxv = [59, 23, 31, 12, 7];
-            $strv = [false, false, false, self::$months, self::$weekdays];
+            foreach ($segments as $index => $segment) {
+                $this->parseSegment($index, $segment, $registers);
+            }
 
-            foreach ($segments as $s => $segment) {
-                // month names, weekdays
-                if ($strv[$s] !== false && isset($strv[$s][strtolower($segment)])) {
-                    // cannot be used with lists or ranges, see crontab(5) man page
-                    $registers[$s][$strv[$s][strtolower($segment)]] = true;
-                    continue;
-                }
+            if (isset($registers[4][7])) {
+                $registers[4][0] = true;
+            }
+        } else {
+            throw new \Exception('invalid number of segments');
+        }
 
-                // split up list into segments (e.g. "1,3-5,9")
-                foreach (explode(',', $segment) as $listsegment) {
-                    // parse stepping notation
-                    if (strpos($listsegment, '/') !== false) {
-                        if (sizeof($stepsegments = explode('/', $listsegment)) === 2) {
-                            $listsegment = $stepsegments[0];
+        return $registers;
+    }
 
-                            if (is_numeric($stepsegments[1])) {
-                                if ($stepsegments[1] > 0 && $stepsegments[1] <= $maxv[$s]) {
-                                    $steps = intval($stepsegments[1]);
-                                } else {
-                                    throw new \Exception('stepping value out of allowed range');
-                                }
+    /**
+     * @param int $index
+     * @param string $segment
+     * @param array $registers
+     * @throws \Exception
+     */
+    private function parseSegment($index, $segment, &$registers)
+    {
+        $minv = [0, 0, 1, 1, 0];
+        $maxv = [59, 23, 31, 12, 7];
+        $strv = [false, false, false, self::$months, self::$weekdays];
+
+        // month names, weekdays
+        if ($strv[$index] !== false && isset($strv[$index][strtolower($segment)])) {
+            // cannot be used with lists or ranges, see crontab(5) man page
+            $registers[$index][$strv[$index][strtolower($segment)]] = true;
+        } else {
+            // split up list into segments (e.g. "1,3-5,9")
+            foreach (explode(',', $segment) as $listsegment) {
+                // parse stepping notation
+                if (strpos($listsegment, '/') !== false) {
+                    if (sizeof($stepsegments = explode('/', $listsegment)) === 2) {
+                        $listsegment = $stepsegments[0];
+
+                        if (is_numeric($stepsegments[1])) {
+                            if ($stepsegments[1] > 0 && $stepsegments[1] <= $maxv[$index]) {
+                                $steps = intval($stepsegments[1]);
                             } else {
-                                throw new \Exception('non-numeric stepping notation');
+                                throw new \Exception('stepping value out of allowed range');
                             }
                         } else {
-                            throw new \Exception('invalid stepping notation');
+                            throw new \Exception('non-numeric stepping notation');
                         }
                     } else {
-                        $steps = 1;
+                        throw new \Exception('invalid stepping notation');
+                    }
+                } else {
+                    $steps = 1;
+                }
+
+                // single value
+                if (is_numeric($listsegment)) {
+                    if (intval($listsegment) < $minv[$index] || intval($listsegment) > $maxv[$index]) {
+                        throw new \Exception('value out of allowed range');
                     }
 
-                    // single value
-                    if (is_numeric($listsegment)) {
-                        if (intval($listsegment) < $minv[$s] || intval($listsegment) > $maxv[$s]) {
-                            throw new \Exception('value out of allowed range');
-                        }
-
-                        if ($steps !== 1) {
-                            throw new \Exception('invalid combination of value and stepping notation');
-                        }
-
-                        $registers[$s][intval($listsegment)] = true;
-                        continue;
+                    if ($steps !== 1) {
+                        throw new \Exception('invalid combination of value and stepping notation');
                     }
 
+                    $registers[$index][intval($listsegment)] = true;
+                } else {
                     // asterisk indicates full range of values
                     if ($listsegment === '*') {
-                        $listsegment = sprintf('%d-%d', $minv[$s], $maxv[$s]);
+                        $listsegment = sprintf('%d-%d', $minv[$index], $maxv[$index]);
                     }
 
                     // range of values, e.g. "9-17"
@@ -301,7 +318,7 @@ class Cron
                         // validate range
                         foreach ($ranges as $range) {
                             if (is_numeric($range)) {
-                                if (intval($range) < $minv[$s] || intval($range) > $maxv[$s]) {
+                                if (intval($range) < $minv[$index] || intval($range) > $maxv[$index]) {
                                     throw new \Exception('invalid range start or end value');
                                 }
                             } else {
@@ -311,35 +328,25 @@ class Cron
 
                         // fill matching register
                         if ($ranges[0] === $ranges[1]) {
-                            $registers[$s][$ranges[0]] = true;
+                            $registers[$index][$ranges[0]] = true;
                         } else {
-                            for ($i = $minv[$s]; $i <= $maxv[$s]; $i++) {
+                            for ($i = $minv[$index]; $i <= $maxv[$index]; $i++) {
                                 if (($i - $ranges[0]) % $steps === 0) {
                                     if ($ranges[0] < $ranges[1]) {
                                         if ($i >= $ranges[0] && $i <= $ranges[1]) {
-                                            $registers[$s][$i] = true;
+                                            $registers[$index][$i] = true;
                                         }
                                     } elseif ($i >= $ranges[0] || $i <= $ranges[1]) {
-                                        $registers[$s][$i] = true;
+                                        $registers[$index][$i] = true;
                                     }
                                 }
                             }
                         }
-
-                        continue;
+                    } else {
+                        throw new \Exception('failed to parse list segment');
                     }
-
-                    throw new \Exception('failed to parse list segment');
                 }
             }
-
-            if (isset($registers[4][7])) {
-                $registers[4][0] = true;
-            }
-        } else {
-            throw new \Exception('invalid number of segments');
         }
-
-        return $registers;
     }
 }
