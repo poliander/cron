@@ -258,8 +258,6 @@ class Cron
      */
     private function parseSegment($index, $segment, &$registers)
     {
-        $minv = [0, 0, 1, 1, 0];
-        $maxv = [59, 23, 31, 12, 7];
         $strv = [false, false, false, self::$months, self::$weekdays];
 
         // month names, weekdays
@@ -267,83 +265,96 @@ class Cron
             // cannot be used with lists or ranges, see crontab(5) man page
             $registers[$index][$strv[$index][strtolower($segment)]] = true;
         } else {
-            // split up list into segments (e.g. "1,3-5,9")
-            foreach (explode(',', $segment) as $listsegment) {
-                // parse stepping notation
-                if (strpos($listsegment, '/') !== false) {
-                    if (sizeof($stepsegments = explode('/', $listsegment)) === 2) {
-                        $listsegment = $stepsegments[0];
+            // split up current segment into single elements, e.g. "1,5-7,*/2" => [ "1", "5-7", "*/2" ]
+            foreach (explode(',', $segment) as $element) {
+                $this->parseElement($index, $element, $registers);
+            }
+        }
+    }
 
-                        if (is_numeric($stepsegments[1])) {
-                            if ($stepsegments[1] > 0 && $stepsegments[1] <= $maxv[$index]) {
-                                $steps = intval($stepsegments[1]);
-                            } else {
-                                throw new \Exception('stepping value out of allowed range');
-                            }
-                        } else {
-                            throw new \Exception('non-numeric stepping notation');
-                        }
+    /**
+     * @param int $index
+     * @param string $element
+     * @param array $registers
+     * @throws \Exception
+     */
+    private function parseElement($index, $element, &$registers)
+    {
+        $stepping = 1;
+        $minv = [0, 0, 1, 1, 0];
+        $maxv = [59, 23, 31, 12, 7];
+
+        // parse stepping notation
+        if (strpos($element, '/') !== false) {
+            if (sizeof($stepsegments = explode('/', $element)) === 2) {
+                $element = $stepsegments[0];
+
+                if (is_numeric($stepsegments[1])) {
+                    if ($stepsegments[1] > 0 && $stepsegments[1] <= $maxv[$index]) {
+                        $stepping = intval($stepsegments[1]);
                     } else {
-                        throw new \Exception('invalid stepping notation');
+                        throw new \Exception('stepping value out of allowed range');
                     }
                 } else {
-                    $steps = 1;
+                    throw new \Exception('non-numeric stepping notation');
+                }
+            } else {
+                throw new \Exception('invalid stepping notation');
+            }
+        }
+
+        // single value
+        if (is_numeric($element)) {
+            if (intval($element) < $minv[$index] || intval($element) > $maxv[$index]) {
+                throw new \Exception('value out of allowed range');
+            }
+
+            if ($stepping !== 1) {
+                throw new \Exception('invalid combination of value and stepping notation');
+            }
+
+            $registers[$index][intval($element)] = true;
+        } else {
+            // asterisk indicates full range of values
+            if ($element === '*') {
+                $element = sprintf('%d-%d', $minv[$index], $maxv[$index]);
+            }
+
+            // range of values, e.g. "9-17"
+            if (strpos($element, '-') !== false) {
+                if (sizeof($ranges = explode('-', $element)) !== 2) {
+                    throw new \Exception('invalid range notation');
                 }
 
-                // single value
-                if (is_numeric($listsegment)) {
-                    if (intval($listsegment) < $minv[$index] || intval($listsegment) > $maxv[$index]) {
-                        throw new \Exception('value out of allowed range');
-                    }
-
-                    if ($steps !== 1) {
-                        throw new \Exception('invalid combination of value and stepping notation');
-                    }
-
-                    $registers[$index][intval($listsegment)] = true;
-                } else {
-                    // asterisk indicates full range of values
-                    if ($listsegment === '*') {
-                        $listsegment = sprintf('%d-%d', $minv[$index], $maxv[$index]);
-                    }
-
-                    // range of values, e.g. "9-17"
-                    if (strpos($listsegment, '-') !== false) {
-                        if (sizeof($ranges = explode('-', $listsegment)) !== 2) {
-                            throw new \Exception('invalid range notation');
-                        }
-
-                        // validate range
-                        foreach ($ranges as $range) {
-                            if (is_numeric($range)) {
-                                if (intval($range) < $minv[$index] || intval($range) > $maxv[$index]) {
-                                    throw new \Exception('invalid range start or end value');
-                                }
-                            } else {
-                                throw new \Exception('non-numeric range notation');
-                            }
-                        }
-
-                        // fill matching register
-                        if ($ranges[0] === $ranges[1]) {
-                            $registers[$index][$ranges[0]] = true;
-                        } else {
-                            for ($i = $minv[$index]; $i <= $maxv[$index]; $i++) {
-                                if (($i - $ranges[0]) % $steps === 0) {
-                                    if ($ranges[0] < $ranges[1]) {
-                                        if ($i >= $ranges[0] && $i <= $ranges[1]) {
-                                            $registers[$index][$i] = true;
-                                        }
-                                    } elseif ($i >= $ranges[0] || $i <= $ranges[1]) {
-                                        $registers[$index][$i] = true;
-                                    }
-                                }
-                            }
+                // validate range
+                foreach ($ranges as $range) {
+                    if (is_numeric($range)) {
+                        if (intval($range) < $minv[$index] || intval($range) > $maxv[$index]) {
+                            throw new \Exception('invalid range start or end value');
                         }
                     } else {
-                        throw new \Exception('failed to parse list segment');
+                        throw new \Exception('non-numeric range notation');
                     }
                 }
+
+                // fill matching register
+                if ($ranges[0] === $ranges[1]) {
+                    $registers[$index][$ranges[0]] = true;
+                } else {
+                    for ($i = $minv[$index]; $i <= $maxv[$index]; $i++) {
+                        if (($i - $ranges[0]) % $stepping === 0) {
+                            if ($ranges[0] < $ranges[1]) {
+                                if ($i >= $ranges[0] && $i <= $ranges[1]) {
+                                    $registers[$index][$i] = true;
+                                }
+                            } elseif ($i >= $ranges[0] || $i <= $ranges[1]) {
+                                $registers[$index][$i] = true;
+                            }
+                        }
+                    }
+                }
+            } else {
+                throw new \Exception('failed to parse list segment');
             }
         }
     }
