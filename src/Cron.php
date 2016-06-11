@@ -89,7 +89,7 @@ class Cron
      *
      * @var array|null
      */
-    protected $registers;
+    protected $register;
 
     /**
      * Class constructor sets cron expression property
@@ -112,7 +112,7 @@ class Cron
     public function setExpression($expression)
     {
         $this->expression = trim((string)$expression);
-        $this->registers = null;
+        $this->register = null;
 
         return $this;
     }
@@ -138,9 +138,9 @@ class Cron
     {
         $result = true;
 
-        if ($this->registers === null) {
+        if ($this->register === null) {
             try {
-                $this->registers = $this->parse();
+                $this->register = $this->parse();
             } catch (\Exception $e) {
                 $result = false;
             }
@@ -234,16 +234,16 @@ class Cron
 
                 list($pday, $pmonth, $pyear, $phour) = [$day, $month, $year, $hour];
 
-                if (isset($this->registers[3][$month]) === false) {
+                if (isset($this->register[3][$month]) === false) {
                     $dt->modify('+1 month');
                     continue;
-                } elseif (false === (isset($this->registers[2][$day]) && isset($this->registers[4][$weekday]))) {
+                } elseif (false === (isset($this->register[2][$day]) && isset($this->register[4][$weekday]))) {
                     $dt->modify('+1 day');
                     continue;
-                } elseif (isset($this->registers[1][$hour]) === false) {
+                } elseif (isset($this->register[1][$hour]) === false) {
                     $dt->modify('+1 hour');
                     continue;
-                } elseif (isset($this->registers[0][$minute]) === false) {
+                } elseif (isset($this->register[0][$minute]) === false) {
                     $dt->modify('+1 minute');
                     continue;
                 }
@@ -256,46 +256,46 @@ class Cron
     }
 
     /**
-     * Parse cron expression and return expression parsed into matchable registers
+     * Parse whole cron expression
      *
      * @return array
      * @throws \Exception
      */
     private function parse()
     {
-        $registers = [];
+        $register = [];
 
         if (sizeof($segments = preg_split('/\s+/', $this->expression)) === 5) {
             foreach ($segments as $index => $segment) {
-                $this->parseSegment($index, $segment, $registers);
+                $this->parseSegment($index, $register, $segment);
             }
 
-            $registers[4][0] = isset($registers[4][7]);
+            $register[4][0] = isset($register[4][7]);
         } else {
             throw new \Exception('invalid number of segments');
         }
 
-        return $registers;
+        return $register;
     }
 
     /**
      * @param int $index
      * @param string $segment
-     * @param array $registers
+     * @param array $register
      * @throws \Exception
      */
-    private function parseSegment($index, $segment, &$registers)
+    private function parseSegment($index, &$register, $segment)
     {
         $strv = [false, false, false, self::$months, self::$weekdays];
 
         // month names, weekdays
         if ($strv[$index] !== false && isset($strv[$index][strtolower($segment)])) {
             // cannot be used with lists or ranges, see crontab(5) man page
-            $registers[$index][$strv[$index][strtolower($segment)]] = true;
+            $register[$index][$strv[$index][strtolower($segment)]] = true;
         } else {
             // split up current segment into single elements, e.g. "1,5-7,*/2" => [ "1", "5-7", "*/2" ]
             foreach (explode(',', $segment) as $element) {
-                $this->parseElement($index, $element, $registers);
+                $this->parseElement($index, $register, $element);
             }
         }
     }
@@ -303,10 +303,10 @@ class Cron
     /**
      * @param int $index
      * @param string $element
-     * @param array $registers
+     * @param array $register
      * @throws \Exception
      */
-    private function parseElement($index, $element, &$registers)
+    private function parseElement($index, array &$register, $element)
     {
         $stepping = $this->parseStepping($index, $element);
 
@@ -321,49 +321,70 @@ class Cron
                 throw new \Exception('invalid combination of value and stepping notation');
             }
 
-            $registers[$index][intval($element)] = true;
+            $register[$index][intval($element)] = true;
         } else {
-            // asterisk indicates full range of values
             if ($element === '*') {
-                $element = sprintf('%d-%d', self::$boundaries[$index]['min'], self::$boundaries[$index]['max']);
-            }
-
-            // range of values, e.g. "9-17"
-            if (strpos($element, '-') !== false) {
-                if (sizeof($ranges = explode('-', $element)) !== 2) {
-                    throw new \Exception('invalid range notation');
-                }
-
-                // validate range
-                foreach ($ranges as $range) {
-                    if (is_numeric($range)) {
-                        if (intval($range) < self::$boundaries[$index]['min'] ||
-                            intval($range) > self::$boundaries[$index]['max']) {
-                            throw new \Exception('invalid range start or end value');
-                        }
-                    } else {
-                        throw new \Exception('non-numeric range notation');
-                    }
-                }
-
-                // fill matching register
-                if ($ranges[0] === $ranges[1]) {
-                    $registers[$index][$ranges[0]] = true;
-                } else {
-                    for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
-                        if (($i - $ranges[0]) % $stepping === 0) {
-                            if ($ranges[0] < $ranges[1]) {
-                                if ($i >= $ranges[0] && $i <= $ranges[1]) {
-                                    $registers[$index][$i] = true;
-                                }
-                            } elseif ($i >= $ranges[0] || $i <= $ranges[1]) {
-                                $registers[$index][$i] = true;
-                            }
-                        }
-                    }
-                }
+                $range = [self::$boundaries[$index]['min'], self::$boundaries[$index]['max']];
+            } elseif (strpos($element, '-') !== false) {
+                $range = explode('-', $element);
             } else {
                 throw new \Exception('failed to parse list segment');
+            }
+
+            $this->parseRange($index, $register, $range, $stepping);
+        }
+    }
+
+    /**
+     * @param int $index
+     * @param array $register
+     * @param array $range
+     * @param int $stepping
+     * @throws \Exception
+     */
+    private function parseRange($index, array &$register, array $range, $stepping)
+    {
+        $this->validateRange($index, $range);
+
+        // fill matching register
+        if ($range[0] === $range[1]) {
+            $register[$index][$range[0]] = true;
+        } else {
+            for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
+                if (($i - $range[0]) % $stepping === 0) {
+                    if ($range[0] < $range[1]) {
+                        if ($i >= $range[0] && $i <= $range[1]) {
+                            $register[$index][$i] = true;
+                        }
+                    } elseif ($i >= $range[0] || $i <= $range[1]) {
+                        $register[$index][$i] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Validate range of values
+     *
+     * @param int $index
+     * @param array $range
+     * @throws \Exception
+     */
+    private function validateRange($index, array $range)
+    {
+        if (sizeof($range) !== 2) {
+            throw new \Exception('invalid range notation');
+        }
+
+        foreach ($range as $value) {
+            if (is_numeric($value)) {
+                if (intval($value) < self::$boundaries[$index]['min'] ||
+                    intval($value) > self::$boundaries[$index]['max']) {
+                    throw new \Exception('invalid range start or end value');
+                }
+            } else {
+                throw new \Exception('non-numeric range notation');
             }
         }
     }
