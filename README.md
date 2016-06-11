@@ -43,5 +43,5 @@ $ts = $cron->getNext();
 | version | release notes |
 | ------- | ------------- |
 | 1.0.0 (2015-06-20) | initial release |
-| 1.1.0 (2016-06-11) | dropped PHP 5.4 support; small refactoring |
+| 1.1.0 (2016-06-11) | dropped PHP 5.4 support |
 
