@@ -242,9 +242,7 @@ class Cron
                 $this->parseSegment($index, $segment, $registers);
             }
 
-            if (isset($registers[4][7])) {
-                $registers[4][0] = true;
-            }
+            $registers[4][0] = isset($registers[4][7]);
         } else {
             throw new \Exception('invalid number of segments');
         }
