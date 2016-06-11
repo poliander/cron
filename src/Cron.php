@@ -348,7 +348,7 @@ class Cron
             throw new \Exception('failed to parse list segment');
         }
 
-        $this->parseValue($index, $register, $range, $stepping);
+        $this->parseValues($index, $register, $range, $stepping);
     }
 
     /**
@@ -378,18 +378,31 @@ class Cron
      * @param array $range
      * @param int $stepping
      */
-    private function parseValue($index, array &$register, array $range, $stepping)
+    private function parseValues($index, array &$register, array $range, $stepping)
     {
         for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
-            if (($i - $range[0]) % $stepping === 0) {
-                if ($range[0] < $range[1]) {
-                    if ($i >= $range[0] && $i <= $range[1]) {
-                        $register[$index][$i] = true;
-                    }
-                } elseif ($i >= $range[0] || $i <= $range[1]) {
-                    $register[$index][$i] = true;
-                }
+            if (($i - $range[0]) % $stepping !== 0) {
+                continue;
             }
+
+            $this->parseValue($index, $register, $range, $i);
+        }
+    }
+
+    /**
+     * @param int $index
+     * @param array $register
+     * @param array $range
+     * @param int $value
+     */
+    private function parseValue($index, array &$register, array $range, $value)
+    {
+        if ($range[0] < $range[1]) {
+            if ($value >= $range[0] && $value <= $range[1]) {
+                $register[$index][$value] = true;
+            }
+        } elseif ($value >= $range[0] || $value <= $range[1]) {
+            $register[$index][$value] = true;
         }
     }
 
