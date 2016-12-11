@@ -317,12 +317,12 @@ class Cron
      */
     private function parseSegment($index, array &$register, $segment)
     {
-        $strv = [false, false, false, self::$months, self::$weekdays];
+        $allowed = [false, false, false, self::$months, self::$weekdays];
 
         // month names, weekdays
-        if ($strv[$index] !== false && isset($strv[$index][strtolower($segment)])) {
+        if ($allowed[$index] !== false && isset($allowed[$index][strtolower($segment)])) {
             // cannot be used with lists or ranges, see crontab(5) man page
-            $register[$index][$strv[$index][strtolower($segment)]] = true;
+            $register[$index][$allowed[$index][strtolower($segment)]] = true;
         } else {
             // split up current segment into single elements, e.g. "1,5-7,*/2" => [ "1", "5-7", "*/2" ]
             foreach (explode(',', $segment) as $element) {
