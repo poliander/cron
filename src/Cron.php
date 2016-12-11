@@ -198,6 +198,8 @@ class Cron
      */
     private function forward(\DateTime $dtime, array $current)
     {
+        $result = false;
+
         if (isset($this->register[3][$current[3]]) === false) {
             $dtime->modify('+1 month');
             $result = true;
@@ -210,8 +212,6 @@ class Cron
         } elseif (isset($this->register[0][$current[0]]) === false) {
             $dtime->modify('+1 minute');
             $result = true;
-        } else {
-            $result = false;
         }
 
         return $result;
