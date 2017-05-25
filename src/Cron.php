@@ -185,7 +185,7 @@ class Cron
             $dtime->setTime(0, 0);
         } elseif ($pointer[0] !== $current[1]) {
             $pointer[0] = $current[1];
-            $dtime->setTime($current[1], 0);
+            $dtime->setTime($current[1], $current[0]);
         }
 
         return $current;
