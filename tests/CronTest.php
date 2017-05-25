@@ -16,11 +16,15 @@ class CronTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($matching, $ct->isMatching($dt->getTimeStamp()));
     }
 
+    /**
+     * @return array
+     */
     public function parserTestProvider()
     {
         return array(
             array("* * * * *",                true, 'now', true),
             array(" *\t    *\t* *  * \t  ",   true, 'now', true),
+            array("1 0 * * *",                true, '2017-05-26 00:01', true),
             array("0 * * * *",                true, '2013-02-13 12:00', true),
             array("* * 1 * *",                true, '2013-03-01 21:43', true),
             array("* * * * 7",                true, '2013-04-07 06:54', true),
@@ -113,12 +117,16 @@ class CronTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($ct->getNext($timestamp), $nextmatch);
     }
 
+    /**
+     * @return array
+     */
     public function getNextProvider()
     {
-        return array(
-            array('* * 13 * fri', 1400407467, 1402610400),
-            array('*/15 * * * *', 1400407520, 1400408100)
-        );
+        return [
+            ['* * 13 * fri', 1400407467, 1402610400],
+            ['*/15 * * * *', 1400407520, 1400408100],
+            ['1 0 * * *', 1495697149, 1495749660]
+        ];
     }
 
     public function testIsMatchingWithDateTime()
