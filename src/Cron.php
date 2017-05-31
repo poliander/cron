@@ -183,8 +183,9 @@ class Cron
                 $dtime->setTime($current[1], $current[0]);
                 break;
 
-            case ($pointer[2] !== $current[2]):
-                $pointer[2] = $current[2];
+            case ($pointer[4] !== $current[4]):
+                $pointer[4] = $current[4];
+                $dtime->setDate($current[4], 1, 1);
                 $dtime->setTime(0, 0);
                 break;
 
@@ -194,9 +195,8 @@ class Cron
                 $dtime->setTime(0, 0);
                 break;
 
-            case ($pointer[4] !== $current[4]):
-                $pointer[4] = $current[4];
-                $dtime->setDate($current[4], 1, 1);
+            case ($pointer[2] !== $current[2]):
+                $pointer[2] = $current[2];
                 $dtime->setTime(0, 0);
                 break;
         }
