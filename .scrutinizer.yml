@@ -6,10 +6,11 @@ checks:
 build:
   environment:
     php: '5.6'
+    postgresql: false
   tests:
     override:
       -
-        command: 'phpunit --coverage-clover=.coverage.tmp'
+        command: 'vendor/bin/phpunit --coverage-clover=.coverage.tmp'
         coverage:
           file: '.coverage.tmp'
           format: 'clover'
