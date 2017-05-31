@@ -151,7 +151,7 @@ class Cron
             $dt = new \DateTime('now', $this->timeZone);
             $dt->setTimestamp(ceil($timestamp / 60) * 60);
 
-            $pointer = sscanf($dt->format('G j n Y'), '%d %d %d %d');
+            $pointer = sscanf($dt->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
                 $current = $this->adjust($dt, $pointer);
@@ -172,20 +172,33 @@ class Cron
     {
         $current = sscanf($dtime->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-        if ($pointer[3] !== $current[4]) {
-            $pointer[3] = $current[4];
-            $dtime->setDate($current[4], 1, 1);
-            $dtime->setTime(0, 0);
-        } elseif ($pointer[2] !== $current[3]) {
-            $pointer[2] = $current[3];
-            $dtime->setDate($current[4], $current[3], 1);
-            $dtime->setTime(0, 0);
-        } elseif ($pointer[1] !== $current[2]) {
-            $pointer[1] = $current[2];
-            $dtime->setTime(0, 0);
-        } elseif ($pointer[0] !== $current[1]) {
-            $pointer[0] = $current[1];
-            $dtime->setTime($current[1], $current[0]);
+        switch (true) {
+            case ($pointer[1] !== $current[1]):
+                $pointer[1] = $current[1];
+                $dtime->setTime($current[1], 0);
+                break;
+
+            case ($pointer[0] !== $current[0]):
+                $pointer[0] = $current[0];
+                $dtime->setTime($current[1], $current[0]);
+                break;
+
+            case ($pointer[2] !== $current[2]):
+                $pointer[2] = $current[2];
+                $dtime->setTime(0, 0);
+                break;
+
+            case ($pointer[3] !== $current[3]):
+                $pointer[3] = $current[3];
+                $dtime->setDate($current[4], $current[3], 1);
+                $dtime->setTime(0, 0);
+                break;
+
+            case ($pointer[4] !== $current[4]):
+                $pointer[4] = $current[4];
+                $dtime->setDate($current[4], 1, 1);
+                $dtime->setTime(0, 0);
+                break;
         }
 
         return $current;
