@@ -140,7 +140,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
     public function testGetNextWithDateTime()
     {
         $cron = new Cron('45 9 * * *', new DateTimeZone('Europe/Berlin'));
-        $dt = new DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
+        $dt = new DateTime('2014-05-18 08:40', new DateTimeZone('Europe/London'));
 
         $this->assertEquals(1400399100, $cron->getNext($dt));
     }
@@ -148,7 +148,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
     public function testGetNextWithoutParameter()
     {
         $cron = new Cron('* * * * *');
-        $this->assertEquals(ceil(time() / 60) * 60, $cron->getNext());
+        $this->assertEquals(ceil((60 + time()) / 60) * 60, $cron->getNext());
     }
 
     public function testGetNextWithTimestamp()
@@ -158,5 +158,16 @@ class CronTest extends \PHPUnit_Framework_TestCase
         $cron = new Cron('45 9 29 feb thu', $tz);
 
         $this->assertEquals(1709196300, $cron->getNext($dt->getTimestamp()));
+    }
+
+    public function testGetNextRepeatedly()
+    {
+        $t = 1496478227;
+        $cron = new Cron('*/30 */2 * * *');
+
+        $this->assertEquals(1496478600, $t = $cron->getNext($t));
+        $this->assertEquals(1496484000, $t = $cron->getNext($t));
+        $this->assertEquals(1496485800, $t = $cron->getNext($t));
+        $this->assertEquals(1496491200, $t = $cron->getNext($t));
     }
 }

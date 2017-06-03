@@ -151,6 +151,10 @@ class Cron
             $dt = new \DateTime('now', $this->timeZone);
             $dt->setTimestamp(ceil($timestamp / 60) * 60);
 
+            if ($this->isMatching($dt)) {
+                $dt->modify('+1 minute');
+            }
+
             $pointer = sscanf($dt->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
@@ -265,7 +269,9 @@ class Cron
             $dtime = $dt;
         }
 
-        $dtime->setTimezone($this->timeZone);
+        if ($this->timeZone !== null) {
+            $dtime->setTimezone($this->timeZone);
+        }
 
         try {
             $result = $this->match(sscanf($dtime->format('i G j n w'), '%d %d %d %d %d'));
