@@ -17,5 +17,7 @@ build:
 coding_style:
   php:
     spaces:
+      around_operators:
+        concatenation: true
       other:
         after_type_cast: false
