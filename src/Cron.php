@@ -120,7 +120,7 @@ class Cron
     /**
      * Set time zone
      *
-     * @param \DateTimeZone $timeZone
+     * @param \DateTimeZone|null $timeZone
      * @return self
      */
     public function setTimeZone(\DateTimeZone $timeZone = null): self
