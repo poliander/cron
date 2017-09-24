@@ -263,10 +263,7 @@ class Cron
     public function isMatching($dtime = null)
     {
         if (false === ($dtime instanceof \DateTime)) {
-            $dt = new \DateTime();
-            $dt->setTimestamp($dtime === null ? time() : $dtime);
-
-            $dtime = $dt;
+            $dtime = (new \DateTime())->setTimestamp($dtime === null ? time() : $dtime);
         }
 
         if ($this->timeZone !== null) {
