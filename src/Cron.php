@@ -95,9 +95,9 @@ class Cron
      * Class constructor sets cron expression property
      *
      * @param string $expression cron expression
-     * @param \DateTimeZone $timeZone
+     * @param \DateTimeZone|null $timeZone
      */
-    public function __construct($expression = '* * * * *', \DateTimeZone $timeZone = null)
+    public function __construct(string $expression = '* * * * *', \DateTimeZone $timeZone = null)
     {
         $this->setExpression($expression);
         $this->setTimeZone($timeZone);
@@ -109,7 +109,7 @@ class Cron
      * @param string $expression
      * @return self
      */
-    public function setExpression($expression)
+    public function setExpression(string $expression): self
     {
         $this->expression = trim((string)$expression);
         $this->register = null;
@@ -123,7 +123,7 @@ class Cron
      * @param \DateTimeZone $timeZone
      * @return self
      */
-    public function setTimeZone(\DateTimeZone $timeZone = null)
+    public function setTimeZone(\DateTimeZone $timeZone = null): self
     {
         $this->timeZone = $timeZone;
         return $this;
@@ -172,7 +172,7 @@ class Cron
      * @param array $pointer
      * @return array
      */
-    private function adjust(\DateTime $dtime, array &$pointer)
+    private function adjust(\DateTime $dtime, array &$pointer): array
     {
         $current = sscanf($dtime->format('i G j n Y w'), '%d %d %d %d %d %d');
 
@@ -213,7 +213,7 @@ class Cron
      * @param array $current
      * @return bool
      */
-    private function forward(\DateTime $dtime, array $current)
+    private function forward(\DateTime $dtime, array $current): bool
     {
         $result = false;
 
@@ -239,7 +239,7 @@ class Cron
      *
      * @return bool true if expression is valid, or false on error
      */
-    public function isValid()
+    public function isValid(): bool
     {
         $result = true;
 
@@ -260,7 +260,7 @@ class Cron
      * @param mixed $dtime \DateTime object, timestamp or null
      * @return bool
      */
-    public function isMatching($dtime = null)
+    public function isMatching($dtime = null): bool
     {
         if (false === ($dtime instanceof \DateTime)) {
             $dtime = (new \DateTime())->setTimestamp($dtime === null ? time() : $dtime);
@@ -284,7 +284,7 @@ class Cron
      * @return bool
      * @throws \Exception
      */
-    private function match(array $segments)
+    private function match(array $segments): bool
     {
         $result = true;
 
@@ -304,7 +304,7 @@ class Cron
      * @return array
      * @throws \Exception
      */
-    private function parse()
+    private function parse(): array
     {
         $register = [];
 
@@ -353,7 +353,7 @@ class Cron
      * @param string $element
      * @throws \Exception
      */
-    private function parseElement($index, array &$register, $element)
+    private function parseElement(int $index, array &$register, string $element)
     {
         $stepping = 1;
 
@@ -383,7 +383,7 @@ class Cron
      * @param int $stepping
      * @throws \Exception
      */
-    private function parseRange($index, array &$register, $range, $stepping)
+    private function parseRange(int $index, array &$register, string $range, int $stepping)
     {
         if ($range === '*') {
             $range = [self::$boundaries[$index]['min'], self::$boundaries[$index]['max']];
@@ -404,7 +404,7 @@ class Cron
      * @param int $stepping
      * @throws \Exception
      */
-    private function parseStepping($index, &$element, &$stepping)
+    private function parseStepping(int $index, string &$element, int &$stepping)
     {
         $segments = explode('/', $element);
 
@@ -422,7 +422,7 @@ class Cron
      * @return array
      * @throws \Exception
      */
-    private function validateRange($index, array $range)
+    private function validateRange(int $index, array $range): array
     {
         if (sizeof($range) !== 2) {
             throw new \Exception('invalid range notation');
@@ -436,10 +436,10 @@ class Cron
     }
     /**
      * @param int $index
-     * @param int $value
+     * @param string $value
      * @throws \Exception
      */
-    private function validateValue($index, $value)
+    private function validateValue(int $index, string $value)
     {
         if (is_numeric($value)) {
             if (intval($value) < self::$boundaries[$index]['min'] ||
@@ -456,7 +456,7 @@ class Cron
      * @param array $segments
      * @throws \Exception
      */
-    private function validateStepping($index, array $segments)
+    private function validateStepping(int $index, array $segments)
     {
         if (sizeof($segments) !== 2) {
             throw new \Exception('invalid stepping notation');
@@ -473,7 +473,7 @@ class Cron
      * @param array $range
      * @param int $stepping
      */
-    private function fillRegister($index, array &$register, array $range, $stepping)
+    private function fillRegister(int $index, array &$register, array $range, int $stepping)
     {
         for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
             if (($i - $range[0]) % $stepping === 0) {
@@ -492,7 +492,7 @@ class Cron
      * @param array $range
      * @param int $value
      */
-    private function fillRegisterAcrossBoundaries($index, array &$register, $range, $value)
+    private function fillRegisterAcrossBoundaries(int $index, array &$register, array $range, int $value)
     {
         if ($value >= $range[0] || $value <= $range[1]) {
             $register[$index][$value] = true;
@@ -505,7 +505,7 @@ class Cron
      * @param array $range
      * @param int $value
      */
-    private function fillRegisterBetweenBoundaries($index, array &$register, $range, $value)
+    private function fillRegisterBetweenBoundaries(int $index, array &$register, array $range, int $value)
     {
         if ($value >= $range[0] && $value <= $range[1]) {
             $register[$index][$value] = true;
