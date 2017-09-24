@@ -132,76 +132,76 @@ class Cron
     /**
      * Calculate next matching timestamp
      *
-     * @param mixed $dtime \DateTime object, timestamp or null
+     * @param mixed $start either a \DateTime object, a timestamp or null for current date/time
      * @return int|bool next matching timestamp, or false on error
      */
-    public function getNext($dtime = null)
+    public function getNext($start = null)
     {
         $result = false;
 
         if ($this->isValid()) {
-            if ($dtime instanceof \DateTime) {
-                $timestamp = $dtime->getTimestamp();
-            } elseif ((int)$dtime > 0) {
-                $timestamp = $dtime;
+            if ($start instanceof \DateTime) {
+                $timestamp = $start->getTimestamp();
+            } elseif ((int)$start > 0) {
+                $timestamp = $start;
             } else {
                 $timestamp = time();
             }
 
-            $dt = new \DateTime('now', $this->timeZone);
-            $dt->setTimestamp(ceil($timestamp / 60) * 60);
+            $now = new \DateTime('now', $this->timeZone);
+            $now->setTimestamp(ceil($timestamp / 60) * 60);
 
-            if ($this->isMatching($dt)) {
-                $dt->modify('+1 minute');
+            if ($this->isMatching($now)) {
+                $now->modify('+1 minute');
             }
 
-            $pointer = sscanf($dt->format('i G j n Y'), '%d %d %d %d %d');
+            $pointer = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
-                $current = $this->adjust($dt, $pointer);
-            } while ($this->forward($dt, $current));
+                $current = $this->adjust($now, $pointer);
+            } while ($this->forward($now, $current));
 
-            $result = $dt->getTimestamp();
+            $result = $now->getTimestamp();
         }
 
         return $result;
     }
 
     /**
-     * @param \DateTime $dtime
+     * @param \DateTime $now
      * @param array $pointer
      * @return array
      */
-    private function adjust(\DateTime $dtime, array &$pointer): array
+    private function adjust(\DateTime $now, array &$pointer): array
     {
-        $current = sscanf($dtime->format('i G j n Y w'), '%d %d %d %d %d %d');
+        $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
         switch (true) {
             case ($pointer[1] !== $current[1]):
                 $pointer[1] = $current[1];
-                $dtime->setTime($current[1], 0);
+                $now->setTime($current[1], 0);
                 break;
 
             case ($pointer[0] !== $current[0]):
                 $pointer[0] = $current[0];
-                $dtime->setTime($current[1], $current[0]);
+                $now->setTime($current[1], $current[0]);
                 break;
 
             case ($pointer[4] !== $current[4]):
                 $pointer[4] = $current[4];
-                $dtime->setDate($current[4], 1, 1);
-                $dtime->setTime(0, 0);
+                $now->setDate($current[4], 1, 1);
+                $now->setTime(0, 0);
                 break;
 
             case ($pointer[3] !== $current[3]):
                 $pointer[3] = $current[3];
-                $dtime->setDate($current[4], $current[3], 1);
-                $dtime->setTime(0, 0);
+                $now->setDate($current[4], $current[3], 1);
+                $now->setTime(0, 0);
                 break;
 
             case ($pointer[2] !== $current[2]):
                 $pointer[2] = $current[2];
-                $dtime->setTime(0, 0);
+                $now->setTime(0, 0);
                 break;
         }
 
@@ -209,25 +209,25 @@ class Cron
     }
 
     /**
-     * @param \DateTime $dtime
+     * @param \DateTime $now
      * @param array $current
      * @return bool
      */
-    private function forward(\DateTime $dtime, array $current): bool
+    private function forward(\DateTime $now, array $current): bool
     {
         $result = false;
 
         if (isset($this->register[3][$current[3]]) === false) {
-            $dtime->modify('+1 month');
+            $now->modify('+1 month');
             $result = true;
         } elseif (false === (isset($this->register[2][$current[2]]) && isset($this->register[4][$current[5]]))) {
-            $dtime->modify('+1 day');
+            $now->modify('+1 day');
             $result = true;
         } elseif (isset($this->register[1][$current[1]]) === false) {
-            $dtime->modify('+1 hour');
+            $now->modify('+1 hour');
             $result = true;
         } elseif (isset($this->register[0][$current[0]]) === false) {
-            $dtime->modify('+1 minute');
+            $now->modify('+1 minute');
             $result = true;
         }
 
@@ -257,21 +257,21 @@ class Cron
     /**
      * Match current or given date/time against cron expression
      *
-     * @param mixed $dtime \DateTime object, timestamp or null
+     * @param mixed $now \DateTime object, timestamp or null
      * @return bool
      */
-    public function isMatching($dtime = null): bool
+    public function isMatching($now = null): bool
     {
-        if (false === ($dtime instanceof \DateTime)) {
-            $dtime = (new \DateTime())->setTimestamp($dtime === null ? time() : $dtime);
+        if (false === ($now instanceof \DateTime)) {
+            $now = (new \DateTime())->setTimestamp($now === null ? time() : $now);
         }
 
         if ($this->timeZone !== null) {
-            $dtime->setTimezone($this->timeZone);
+            $now->setTimezone($this->timeZone);
         }
 
         try {
-            $result = $this->match(sscanf($dtime->format('i G j n w'), '%d %d %d %d %d'));
+            $result = $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
         } catch (\Exception $e) {
             $result = false;
         }
@@ -337,7 +337,7 @@ class Cron
 
         // month names, weekdays
         if ($allowed[$index] !== false && isset($allowed[$index][strtolower($segment)])) {
-            // cannot be used with lists or ranges, see crontab(5) man page
+            // cannot be used together with lists or ranges
             $register[$index][$allowed[$index][strtolower($segment)]] = true;
         } else {
             // split up current segment into single elements, e.g. "1,5-7,*/2" => [ "1", "5-7", "*/2" ]
