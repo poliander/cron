@@ -47,3 +47,4 @@ $ts = $cron->getNext();
 | 1.2.0 (2016-12-11) | added PHP 7.1 support |
 | 1.2.1 (2017-05-25) | ~~fixed #3~~ |
 | 1.2.2 (2017-06-03) | fixed #3, #4 |
+| master | added PHP 7.2 support, dropped PHP 5.5/5.6 support
