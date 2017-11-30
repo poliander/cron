@@ -17,8 +17,12 @@
     "phpunit/phpunit": "~6.4.0"
   },
   "autoload": {
-    "files": [
-      "src/Cron.php"
-    ]
-  }
-}
+    "psr-4": {
+      "Cron\\": "src/Cron/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Cron\\": "tests/Cron/"
+    }
+}}

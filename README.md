@@ -10,32 +10,37 @@ Standard (V7) compliant crontab expression parser/validator with support for tim
 
 #### Installation
 
-Using composer, include a dependency for `poliander/cron` in your `composer.json` file:
+Using composer, add a requirement for `poliander/cron` to your `composer.json` file:
 ```
-"require": {
-    "poliander/cron": "1.*"
-}
+composer require poliander/cron
 ```
 
 #### Examples
 
-Validate a cron expression:
+Validate a certain crontab expression:
 ```php
-$cron = new Cron('15,45 */2 * * *');
-$isValid = $cron->isValid(); // returns true
+$expression = new \Cron\CronExpression('15,45 */2 * * *');
+$isValid = $expression->isValid(); // returns true
 ```
 
-Check whether given date/time matches a cron expression:
+Check whether a given point in time is matching a certain cron expression:
 ```php
-$cron = new Cron('45 9 * * *', new DateTimeZone('Europe/Berlin'));
-$dt = new DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
-$isMatching = $cron->isMatching($dt); // returns true
+$expression = new \Cron\CronExpression('45 9 * * *');
+$dt = new \DateTime('2014-05-18 09:45');
+$isMatching = $expression->isMatching($dt); // returns true
+```
+
+Match an expression across different time zones:
+```php
+$expression = new \Cron\CronExpression('45 9 * * *', new DateTimeZone('Europe/Berlin'));
+$dt = new \DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
+$isMatching = $expression->isMatching($dt); // returns true
 ```
 
 Calculate next timestamp matching a Friday, the 13th:
 ```php
-$cron = new Cron('* * 13 * fri');
-$ts = $cron->getNext();
+$expression = new \Cron\CronExpression('* * 13 * fri');
+$when = $expression->getNext();
 ```
 
 #### Changelog
@@ -47,4 +52,4 @@ $ts = $cron->getNext();
 | 1.2.0 (2016-12-11) | added PHP 7.1 support |
 | 1.2.1 (2017-05-25) | ~~fixed #3~~ |
 | 1.2.2 (2017-06-03) | fixed #3, #4 |
-| master | added PHP 7.2 support, dropped PHP 5.5/5.6 support
+| master | dropped PHP 5.x, added PHP 7.2 support, added vendor namespace (closes #2) |

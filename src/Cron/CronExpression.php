@@ -1,11 +1,13 @@
 <?php
 
+namespace Cron;
+
 /**
  * Cron expression parser and validator
  *
  * @author René Pollesch
  */
-class Cron
+class CronExpression
 {
     /**
      * Weekday look-up table
@@ -111,7 +113,7 @@ class Cron
      */
     public function setExpression(string $expression): self
     {
-        $this->expression = trim((string)$expression);
+        $this->expression = trim($expression);
         $this->register = null;
 
         return $this;

@@ -1,22 +1,30 @@
 <?php
 
-require_once __DIR__ . '/../src/Cron.php';
+namespace Cron;
+
+use PHPUnit\Framework\TestCase;
 
 /**
- * Tests for \Cron class
+ * Tests for class CronExpression
+ *
+ * @author René Pollesch
  */
-class CronTest extends \PHPUnit\Framework\TestCase
+class CronExpressionTest extends TestCase
 {
     /**
+     * @param string $expression
+     * @param bool $valid
+     * @param string $when
+     * @param bool $matching
      * @dataProvider parserTestProvider
      */
-    public function testParser($expression, $valid = false, $now = 'now', $matching = false)
+    public function testParser(string $expression, bool $valid = false, string $when = 'now', bool $matching = false)
     {
-        $ct = new Cron($expression, new DateTimeZone('Europe/Berlin'));
-        $dt = new DateTime($now, new DateTimeZone('Europe/Berlin'));
+        $which = new CronExpression($expression, new \DateTimeZone('Europe/Berlin'));
+        $when = new \DateTime($when, new \DateTimeZone('Europe/Berlin'));
 
-        $this->assertEquals($valid, $ct->isValid());
-        $this->assertEquals($matching, $ct->isMatching($dt->getTimeStamp()));
+        $this->assertEquals($valid, $which->isValid());
+        $this->assertEquals($matching, $which->isMatching($when->getTimeStamp()));
     }
 
     /**
@@ -112,12 +120,15 @@ class CronTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param string $expression
+     * @param int $timestamp
+     * @param int $next
      * @dataProvider getNextProvider
      */
-    public function testGetNext($expression, $timestamp, $nextmatch)
+    public function testGetNext(string $expression, int $timestamp, int $next)
     {
-        $ct = new Cron($expression, new \DateTimeZone('Europe/Berlin'));
-        $this->assertEquals($ct->getNext($timestamp), $nextmatch);
+        $what = new CronExpression($expression, new \DateTimeZone('Europe/Berlin'));
+        $this->assertEquals($what->getNext($timestamp), $next);
     }
 
     /**
@@ -135,42 +146,42 @@ class CronTest extends \PHPUnit\Framework\TestCase
 
     public function testIsMatchingWithDateTime()
     {
-        $cron = new Cron('45 9 * * *', new DateTimeZone('Europe/Berlin'));
-        $dt = new DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
-        $this->assertEquals(true, $cron->isMatching($dt));
+        $cron = new CronExpression('45 9 * * *', new \DateTimeZone('Europe/Berlin'));
+        $when = new \DateTime('2014-05-18 08:45', new \DateTimeZone('Europe/London'));
+        $this->assertEquals(true, $cron->isMatching($when));
     }
 
     public function testGetNextWithDateTime()
     {
-        $cron = new Cron('45 9 * * *', new DateTimeZone('Europe/Berlin'));
-        $dt = new DateTime('2014-05-18 08:40', new DateTimeZone('Europe/London'));
+        $expression = new CronExpression('45 9 * * *', new \DateTimeZone('Europe/Berlin'));
+        $when = new \DateTime('2014-05-18 08:40', new \DateTimeZone('Europe/London'));
 
-        $this->assertEquals(1400399100, $cron->getNext($dt));
+        $this->assertEquals(1400399100, $expression->getNext($when));
     }
 
     public function testGetNextWithoutParameter()
     {
-        $cron = new Cron('* * * * *');
+        $cron = new CronExpression('* * * * *');
         $this->assertEquals(ceil((60 + time()) / 60) * 60, $cron->getNext());
     }
 
     public function testGetNextWithTimestamp()
     {
-        $tz = new DateTimezone('Europe/Berlin');
-        $dt = new DateTime('2014-12-31 23:42', $tz);
-        $cron = new Cron('45 9 29 feb thu', $tz);
+        $timeZone = new \DateTimezone('Europe/Berlin');
+        $when = new \DateTime('2014-12-31 23:42', $timeZone);
+        $expression = new CronExpression('45 9 29 feb thu', $timeZone);
 
-        $this->assertEquals(1709196300, $cron->getNext($dt->getTimestamp()));
+        $this->assertEquals(1709196300, $expression->getNext($when->getTimestamp()));
     }
 
     public function testGetNextRepeatedly()
     {
-        $t = 1496478227;
-        $cron = new Cron('*/30 */2 * * *');
+        $when = 1496478227;
+        $cron = new CronExpression('*/30 */2 * * *');
 
-        $this->assertEquals(1496478600, $t = $cron->getNext($t));
-        $this->assertEquals(1496484000, $t = $cron->getNext($t));
-        $this->assertEquals(1496485800, $t = $cron->getNext($t));
-        $this->assertEquals(1496491200, $t = $cron->getNext($t));
+        $this->assertEquals(1496478600, $when = $cron->getNext($when));
+        $this->assertEquals(1496484000, $when = $cron->getNext($when));
+        $this->assertEquals(1496485800, $when = $cron->getNext($when));
+        $this->assertEquals(1496491200, $when = $cron->getNext($when));
     }
 }
