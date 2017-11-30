@@ -52,4 +52,4 @@ $when = $expression->getNext();
 | 1.2.0 (2016-12-11) | added PHP 7.1 support |
 | 1.2.1 (2017-05-25) | ~~fixed #3~~ |
 | 1.2.2 (2017-06-03) | fixed #3, #4 |
-| master | dropped PHP 5.x, added PHP 7.2 support, added vendor namespace (closes #2) |
+| 2.0.0 (2017-11-30) | dropped PHP 5.x, added PHP 7.2 support, added vendor namespace (closes #2) |
