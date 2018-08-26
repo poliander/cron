@@ -11,21 +11,21 @@ use PHPUnit\Framework\TestCase;
  */
 class CronExpressionTest extends TestCase
 {
-//    /**
-//     * @param string $expression
-//     * @param bool $valid
-//     * @param string $when
-//     * @param bool $matching
-//     * @dataProvider parserTestProvider
-//     */
-//    public function testParser(string $expression, bool $valid = false, string $when = 'now', bool $matching = false)
-//    {
-//        $which = new CronExpression($expression, new \DateTimeZone('Europe/Berlin'));
-//        $when = new \DateTime($when, new \DateTimeZone('Europe/Berlin'));
-//
-//        $this->assertEquals($valid, $which->isValid());
-//        $this->assertEquals($matching, $which->isMatching($when->getTimeStamp()));
-//    }
+    /**
+     * @param string $expression
+     * @param bool $valid
+     * @param string $when
+     * @param bool $matching
+     * @dataProvider parserTestProvider
+     */
+    public function testParser(string $expression, bool $valid = false, string $when = 'now', bool $matching = false)
+    {
+        $which = new CronExpression($expression, new \DateTimeZone('Europe/Berlin'));
+        $when = new \DateTime($when, new \DateTimeZone('Europe/Berlin'));
+
+        $this->assertEquals($valid, $which->isValid());
+        $this->assertEquals($matching, $which->isMatching($when->getTimeStamp()));
+    }
 
     /**
      * @return array
@@ -141,9 +141,9 @@ class CronExpressionTest extends TestCase
             ['*/15 * * * *', 1400407520, 1400408100],
             ['1 0 * * *', 1495697149, 1495749660],
             ['1 0 * * *', 1496223073, 1496268060],
-            ['1,2 0 * * *', 1535234400, 1535234460],
-            ['1,2 0 * * *', 1535234460, 1535234520],
-            ['1,2 0 * * *', 1535234520, 1535320860],
+            ['1,2 * * * *', 1535234400, 1535234460], // at 00:00, 00:01 is expected
+            ['1,2 * * * *', 1535234460, 1535234520], // at 00:01, 00:02 is expected
+            ['1,2 * * * *', 1535234520, 1535238060],   // att 00:02, 01:01 is expected
         ];
     }
 
