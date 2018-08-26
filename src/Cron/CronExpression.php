@@ -160,8 +160,8 @@ class CronExpression
             $pointer = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
-                $current = $this->adjust($now, $pointer);
-            } while ($this->forward($now, $current));
+                $this->forward($now, $this->adjust($now, $pointer));
+            } while (false === $this->isMatching($now));
 
             $result = $now->getTimestamp();
         }
