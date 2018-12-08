@@ -5,7 +5,7 @@ checks:
   php: true
 build:
   environment:
-    php: '7.0'
+    php: '7.1'
     postgresql: false
     redis: false
   tests:
