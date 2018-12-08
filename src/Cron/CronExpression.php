@@ -136,6 +136,7 @@ class CronExpression
      *
      * @param mixed $start either a \DateTime object, a timestamp or null for current date/time
      * @return int|bool next matching timestamp, or false on error
+     * @throws \Exception
      */
     public function getNext($start = null)
     {
@@ -261,6 +262,7 @@ class CronExpression
      *
      * @param mixed $now \DateTime object, timestamp or null
      * @return bool
+     * @throws \Exception
      */
     public function isMatching($now = null): bool
     {
