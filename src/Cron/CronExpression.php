@@ -14,7 +14,7 @@ class CronExpression
      *
      * @var array
      */
-    protected static $weekdays = [
+    private const CRON_WEEKDAYS = [
         'sun' => 0,
         'mon' => 1,
         'tue' => 2,
@@ -29,7 +29,7 @@ class CronExpression
      *
      * @var array
      */
-    protected static $months = [
+    private const CRON_MONTHS = [
         'jan' => 1,
         'feb' => 2,
         'mar' => 3,
@@ -329,7 +329,7 @@ class CronExpression
      */
     private function parseSegment($index, array &$register, $segment)
     {
-        $allowed = [false, false, false, self::$months, self::$weekdays];
+        $allowed = [false, false, false, self::CRON_MONTHS, self::CRON_WEEKDAYS];
 
         // month names, weekdays
         if ($allowed[$index] !== false && isset($allowed[$index][strtolower($segment)])) {
