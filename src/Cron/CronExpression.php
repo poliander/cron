@@ -10,9 +10,7 @@ namespace Cron;
 class CronExpression
 {
     /**
-     * Weekday look-up table
-     *
-     * @var array
+     * Weekday name look-up table
      */
     private const WEEKDAY_NAMES = [
         'sun' => 0,
@@ -26,8 +24,6 @@ class CronExpression
 
     /**
      * Month name look-up table
-     *
-     * @var array
      */
     private const MONTH_NAMES = [
         'jan' => 1,
@@ -46,8 +42,6 @@ class CronExpression
 
     /**
      * Value boundaries
-     *
-     * @var array
      */
     private const VALUE_BOUNDARIES = [
         0 => [
