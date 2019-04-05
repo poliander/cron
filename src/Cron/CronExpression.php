@@ -146,7 +146,7 @@ class CronExpression
             }
 
             $now = new \DateTime('now', $this->timeZone);
-            $now->setTimestamp(ceil($timestamp / 60) * 60);
+            $now->setTimestamp(intval(ceil($timestamp / 60)) * 60);
 
             if ($this->isMatching($now)) {
                 $now->modify('+1 minute');
