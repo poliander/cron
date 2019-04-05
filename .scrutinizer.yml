@@ -4,6 +4,11 @@ filter:
 checks:
   php: true
 build:
+  nodes:
+    analysis:
+      tests:
+        override:
+          - php-scrutinizer-run
   environment:
     php: '7.1'
     postgresql: false
