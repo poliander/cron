@@ -300,9 +300,11 @@ class CronExpression
      */
     private function parse(): array
     {
-        $register = [];
+        $segments = preg_split('/\s+/', $this->expression);
 
-        if (sizeof($segments = preg_split('/\s+/', $this->expression)) === 5) {
+        if (is_array($segments) && sizeof($segments) === 5) {
+            $register = [];
+
             foreach ($segments as $index => $segment) {
                 $this->parseSegment($index, $register, $segment);
             }
@@ -310,11 +312,11 @@ class CronExpression
             if (isset($register[4][7])) {
                 $register[4][0] = true;
             }
-        } else {
-            throw new \Exception('invalid number of segments');
+
+            return $register;
         }
 
-        return $register;
+        throw new \Exception('invalid number of segments');
     }
 
     /**
