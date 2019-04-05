@@ -179,33 +179,23 @@ class CronExpression
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-        switch (true) {
-            case ($pointer[1] !== $current[1]):
-                $pointer[1] = $current[1];
-                $now->setTime($current[1], 0);
-                break;
-
-            case ($pointer[0] !== $current[0]):
-                $pointer[0] = $current[0];
-                $now->setTime($current[1], $current[0]);
-                break;
-
-            case ($pointer[4] !== $current[4]):
-                $pointer[4] = $current[4];
-                $now->setDate($current[4], 1, 1);
-                $now->setTime(0, 0);
-                break;
-
-            case ($pointer[3] !== $current[3]):
-                $pointer[3] = $current[3];
-                $now->setDate($current[4], $current[3], 1);
-                $now->setTime(0, 0);
-                break;
-
-            case ($pointer[2] !== $current[2]):
-                $pointer[2] = $current[2];
-                $now->setTime(0, 0);
-                break;
+        if ($pointer[1] !== $current[1]) {
+            $pointer[1] = $current[1];
+            $now->setTime($current[1], 0);
+        } elseif ($pointer[0] !== $current[0]) {
+            $pointer[0] = $current[0];
+            $now->setTime($current[1], $current[0]);
+        } elseif ($pointer[4] !== $current[4]) {
+            $pointer[4] = $current[4];
+            $now->setDate($current[4], 1, 1);
+            $now->setTime(0, 0);
+        } elseif ($pointer[3] !== $current[3]) {
+            $pointer[3] = $current[3];
+            $now->setDate($current[4], $current[3], 1);
+            $now->setTime(0, 0);
+        } elseif ($pointer[2] !== $current[2]) {
+            $pointer[2] = $current[2];
+            $now->setTime(0, 0);
         }
 
         return $current;
