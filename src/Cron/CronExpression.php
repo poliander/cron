@@ -14,7 +14,7 @@ class CronExpression
      *
      * @var array
      */
-    private const CRON_WEEKDAYS = [
+    private const WEEKDAY_NAMES = [
         'sun' => 0,
         'mon' => 1,
         'tue' => 2,
@@ -29,7 +29,7 @@ class CronExpression
      *
      * @var array
      */
-    private const CRON_MONTHS = [
+    private const MONTH_NAMES = [
         'jan' => 1,
         'feb' => 2,
         'mar' => 3,
@@ -49,7 +49,7 @@ class CronExpression
      *
      * @var array
      */
-    protected static $boundaries = [
+    private const VALUE_BOUNDARIES = [
         0 => [
             'min' => 0,
             'max' => 59
@@ -329,7 +329,7 @@ class CronExpression
      */
     private function parseSegment($index, array &$register, $segment)
     {
-        $allowed = [false, false, false, self::CRON_MONTHS, self::CRON_WEEKDAYS];
+        $allowed = [false, false, false, self::MONTH_NAMES, self::WEEKDAY_NAMES];
 
         // month names, weekdays
         if ($allowed[$index] !== false && isset($allowed[$index][strtolower($segment)])) {
@@ -382,7 +382,7 @@ class CronExpression
     private function parseRange(int $index, array &$register, string $range, int $stepping)
     {
         if ($range === '*') {
-            $range = [self::$boundaries[$index]['min'], self::$boundaries[$index]['max']];
+            $range = [self::VALUE_BOUNDARIES[$index]['min'], self::VALUE_BOUNDARIES[$index]['max']];
         } elseif (strpos($range, '-') !== false) {
             $range = $this->validateRange($index, explode('-', $range));
         } else {
@@ -438,8 +438,8 @@ class CronExpression
     private function validateValue(int $index, string $value)
     {
         if (is_numeric($value)) {
-            if (intval($value) < self::$boundaries[$index]['min'] ||
-                intval($value) > self::$boundaries[$index]['max']) {
+            if (intval($value) < self::VALUE_BOUNDARIES[$index]['min'] ||
+                intval($value) > self::VALUE_BOUNDARIES[$index]['max']) {
                 throw new \Exception('value boundary exceeded');
             }
         } else {
@@ -458,7 +458,7 @@ class CronExpression
             throw new \Exception('invalid stepping notation');
         }
 
-        if ((int)$segments[1] <= 0 || (int)$segments[1] > self::$boundaries[$index]['max']) {
+        if ((int)$segments[1] <= 0 || (int)$segments[1] > self::VALUE_BOUNDARIES[$index]['max']) {
             throw new \Exception('stepping out of allowed range');
         }
     }
@@ -471,7 +471,7 @@ class CronExpression
      */
     private function fillRegister(int $index, array &$register, array $range, int $stepping)
     {
-        for ($i = self::$boundaries[$index]['min']; $i <= self::$boundaries[$index]['max']; $i++) {
+        for ($i = self::VALUE_BOUNDARIES[$index]['min']; $i <= self::VALUE_BOUNDARIES[$index]['max']; $i++) {
             if (($i - $range[0]) % $stepping === 0) {
                 if ($range[0] < $range[1]) {
                     $this->fillRegisterBetweenBoundaries($index, $register, $range, $i);
