@@ -4,6 +4,9 @@ namespace Cron;
 
 use PHPUnit\Framework\TestCase;
 
+use DateTime;
+use DateTimeZone;
+
 /**
  * Tests for class CronExpression
  *
@@ -20,8 +23,8 @@ class CronExpressionTest extends TestCase
      */
     public function testParser(string $expression, bool $valid = false, string $when = 'now', bool $matching = false)
     {
-        $which = new CronExpression($expression, new \DateTimeZone('Europe/Berlin'));
-        $when = new \DateTime($when, new \DateTimeZone('Europe/Berlin'));
+        $which = new CronExpression($expression, new DateTimeZone('Europe/Berlin'));
+        $when = new DateTime($when, new DateTimeZone('Europe/Berlin'));
 
         $this->assertEquals($valid, $which->isValid());
         $this->assertEquals($matching, $which->isMatching($when->getTimeStamp()));
@@ -140,7 +143,7 @@ class CronExpressionTest extends TestCase
      */
     public function testGetNext(string $expression, int $timestampCurrent, int $timestampNext)
     {
-        $what = new CronExpression($expression, new \DateTimeZone('Europe/Berlin'));
+        $what = new CronExpression($expression, new DateTimeZone('Europe/Berlin'));
         $this->assertEquals($timestampNext, $what->getNext($timestampCurrent));
     }
 
@@ -162,15 +165,15 @@ class CronExpressionTest extends TestCase
 
     public function testIsMatchingWithDateTime()
     {
-        $cron = new CronExpression('45 9 * * *', new \DateTimeZone('Europe/Berlin'));
-        $when = new \DateTime('2014-05-18 08:45', new \DateTimeZone('Europe/London'));
+        $cron = new CronExpression('45 9 * * *', new DateTimeZone('Europe/Berlin'));
+        $when = new DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
         $this->assertEquals(true, $cron->isMatching($when));
     }
 
     public function testGetNextWithDateTime()
     {
-        $expression = new CronExpression('45 9 * * *', new \DateTimeZone('Europe/Berlin'));
-        $when = new \DateTime('2014-05-18 08:40', new \DateTimeZone('Europe/London'));
+        $expression = new CronExpression('45 9 * * *', new DateTimeZone('Europe/Berlin'));
+        $when = new DateTime('2014-05-18 08:40', new DateTimeZone('Europe/London'));
 
         $this->assertEquals(1400399100, $expression->getNext($when));
     }
@@ -183,8 +186,8 @@ class CronExpressionTest extends TestCase
 
     public function testGetNextWithTimestamp()
     {
-        $timeZone = new \DateTimezone('Europe/Berlin');
-        $when = new \DateTime('2014-12-31 23:42', $timeZone);
+        $timeZone = new DateTimezone('Europe/Berlin');
+        $when = new DateTime('2014-12-31 23:42', $timeZone);
         $expression = new CronExpression('45 9 29 feb thu', $timeZone);
 
         $this->assertEquals(1709196300, $expression->getNext($when->getTimestamp()));
