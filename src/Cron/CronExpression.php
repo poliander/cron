@@ -85,7 +85,7 @@ class CronExpression
     /**
      * Time zone
      *
-     * @var DateTimeZone
+     * @var DateTimeZone|null
      */
     protected $timeZone;
 
