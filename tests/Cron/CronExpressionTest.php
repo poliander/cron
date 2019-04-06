@@ -98,6 +98,8 @@ class CronExpressionTest extends TestCase
             ["* * * * 0",                true, '2013-07-07 00:00', true],
             ["1-1 * * * *",              true, '2012-04-07 00:01', true],
             ["44 22 */4 * *",            true, '2019-04-01 22:44', true],
+            ["44 22 */4 * *",            true, '2019-04-05 22:44', true],
+            ["44 22 */4 * *",            true, '2019-04-09 22:44', true],
 
             ["foobar"],
             ["* * * *"],
