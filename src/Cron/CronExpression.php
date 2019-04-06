@@ -381,14 +381,12 @@ class CronExpression
     {
         if ($range === '*') {
             $range = [self::VALUE_BOUNDARIES[$index]['min'], self::VALUE_BOUNDARIES[$index]['max']];
-        } elseif (strpos($range, '-') !== false) {
+        } else {
             $range = explode('-', $range);
             $this->validateRange($range, $index);
-        } else {
-            throw new Exception('failed to parse list segment');
         }
 
-        $this->fillRegister($register, $index, $range, $stepping);
+        $this->fillRange($register, $index, $range, $stepping);
     }
 
     /**
@@ -465,7 +463,7 @@ class CronExpression
      * @param array $range
      * @param int $stepping
      */
-    private function fillRegister(array &$register, int $index, array $range, int $stepping)
+    private function fillRange(array &$register, int $index, array $range, int $stepping)
     {
         for ($i = self::VALUE_BOUNDARIES[$index]['min']; $i <= self::VALUE_BOUNDARIES[$index]['max']; $i++) {
             if (($i - $range[0]) % $stepping === 0) {
