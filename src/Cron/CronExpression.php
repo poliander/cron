@@ -2,6 +2,10 @@
 
 namespace Cron;
 
+use \DateTime;
+use \DateTimeZone;
+use \Exception;
+
 /**
  * Cron expression parser and validator
  *
@@ -76,7 +80,7 @@ class CronExpression
     /**
      * Time zone
      *
-     * @var \DateTimeZone
+     * @var DateTimeZone
      */
     protected $timeZone;
 
@@ -91,9 +95,9 @@ class CronExpression
      * Class constructor sets cron expression property
      *
      * @param string $expression cron expression
-     * @param \DateTimeZone|null $timeZone
+     * @param DateTimeZone|null $timeZone
      */
-    public function __construct(string $expression = '* * * * *', \DateTimeZone $timeZone = null)
+    public function __construct(string $expression = '* * * * *', DateTimeZone $timeZone = null)
     {
         $this->setExpression($expression);
         $this->setTimeZone($timeZone);
@@ -116,10 +120,10 @@ class CronExpression
     /**
      * Set time zone
      *
-     * @param \DateTimeZone|null $timeZone
+     * @param DateTimeZone|null $timeZone
      * @return self
      */
-    public function setTimeZone(\DateTimeZone $timeZone = null): self
+    public function setTimeZone(DateTimeZone $timeZone = null): self
     {
         $this->timeZone = $timeZone;
         return $this;
@@ -130,14 +134,14 @@ class CronExpression
      *
      * @param mixed $start either a \DateTime object, a timestamp or null for current date/time
      * @return int|bool next matching timestamp, or false on error
-     * @throws \Exception
+     * @throws Exception
      */
     public function getNext($start = null)
     {
         $result = false;
 
         if ($this->isValid()) {
-            if ($start instanceof \DateTime) {
+            if ($start instanceof DateTime) {
                 $timestamp = $start->getTimestamp();
             } elseif ((int)$start > 0) {
                 $timestamp = $start;
@@ -145,7 +149,7 @@ class CronExpression
                 $timestamp = time();
             }
 
-            $now = new \DateTime('now', $this->timeZone);
+            $now = new DateTime('now', $this->timeZone);
             $now->setTimestamp(intval(ceil($timestamp / 60)) * 60);
 
             if ($this->isMatching($now)) {
@@ -165,11 +169,11 @@ class CronExpression
     }
 
     /**
-     * @param \DateTime $now
+     * @param DateTime $now
      * @param array $pointer
      * @return array
      */
-    private function adjust(\DateTime $now, array &$pointer): array
+    private function adjust(DateTime $now, array &$pointer): array
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
@@ -196,11 +200,11 @@ class CronExpression
     }
 
     /**
-     * @param \DateTime $now
+     * @param DateTime $now
      * @param array $current
      * @return bool
      */
-    private function forward(\DateTime $now, array $current): bool
+    private function forward(DateTime $now, array $current): bool
     {
         $result = false;
 
@@ -233,7 +237,7 @@ class CronExpression
         if ($this->register === null) {
             try {
                 $this->register = $this->parse();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $result = false;
             }
         }
@@ -246,12 +250,12 @@ class CronExpression
      *
      * @param mixed $now \DateTime object, timestamp or null
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function isMatching($now = null): bool
     {
-        if (false === ($now instanceof \DateTime)) {
-            $now = (new \DateTime())->setTimestamp($now === null ? time() : $now);
+        if (false === ($now instanceof DateTime)) {
+            $now = (new DateTime())->setTimestamp($now === null ? time() : $now);
         }
 
         if ($this->timeZone !== null) {
@@ -260,7 +264,7 @@ class CronExpression
 
         try {
             $result = $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result = false;
         }
 
@@ -270,7 +274,7 @@ class CronExpression
     /**
      * @param array $segments
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     private function match(array $segments): bool
     {
@@ -290,7 +294,7 @@ class CronExpression
      * Parse whole cron expression
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     private function parse(): array
     {
@@ -310,7 +314,7 @@ class CronExpression
             return $register;
         }
 
-        throw new \Exception('invalid number of segments');
+        throw new Exception('invalid number of segments');
     }
 
     /**
@@ -319,7 +323,7 @@ class CronExpression
      * @param int $index
      * @param string $segment
      * @param array $register
-     * @throws \Exception
+     * @throws Exception
      */
     private function parseSegment($index, array &$register, $segment)
     {
@@ -341,7 +345,7 @@ class CronExpression
      * @param int $index
      * @param array $register
      * @param string $element
-     * @throws \Exception
+     * @throws Exception
      */
     private function parseElement(int $index, array &$register, string $element)
     {
@@ -355,7 +359,7 @@ class CronExpression
             $this->validateValue($index, $element);
 
             if ($stepping !== 1) {
-                throw new \Exception('invalid combination of value and stepping notation');
+                throw new Exception('invalid combination of value and stepping notation');
             }
 
             $register[$index][intval($element)] = true;
@@ -371,7 +375,7 @@ class CronExpression
      * @param array $register
      * @param string $range
      * @param int $stepping
-     * @throws \Exception
+     * @throws Exception
      */
     private function parseRange(int $index, array &$register, string $range, int $stepping)
     {
@@ -380,7 +384,7 @@ class CronExpression
         } elseif (strpos($range, '-') !== false) {
             $range = $this->validateRange($index, explode('-', $range));
         } else {
-            throw new \Exception('failed to parse list segment');
+            throw new Exception('failed to parse list segment');
         }
 
         $this->fillRegister($index, $register, $range, $stepping);
@@ -392,7 +396,7 @@ class CronExpression
      * @param int $index
      * @param string $element
      * @param int $stepping
-     * @throws \Exception
+     * @throws Exception
      */
     private function parseStepping(int $index, string &$element, int &$stepping)
     {
@@ -410,12 +414,12 @@ class CronExpression
      * @param int $index
      * @param array $range
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     private function validateRange(int $index, array $range): array
     {
         if (sizeof($range) !== 2) {
-            throw new \Exception('invalid range notation');
+            throw new Exception('invalid range notation');
         }
 
         foreach ($range as $value) {
@@ -427,33 +431,33 @@ class CronExpression
     /**
      * @param int $index
      * @param string $value
-     * @throws \Exception
+     * @throws Exception
      */
     private function validateValue(int $index, string $value)
     {
         if (is_numeric($value)) {
             if (intval($value) < self::VALUE_BOUNDARIES[$index]['min'] ||
                 intval($value) > self::VALUE_BOUNDARIES[$index]['max']) {
-                throw new \Exception('value boundary exceeded');
+                throw new Exception('value boundary exceeded');
             }
         } else {
-            throw new \Exception('non-integer value');
+            throw new Exception('non-integer value');
         }
     }
 
     /**
      * @param int $index
      * @param array $segments
-     * @throws \Exception
+     * @throws Exception
      */
     private function validateStepping(int $index, array $segments)
     {
         if (sizeof($segments) !== 2) {
-            throw new \Exception('invalid stepping notation');
+            throw new Exception('invalid stepping notation');
         }
 
         if ((int)$segments[1] <= 0 || (int)$segments[1] > self::VALUE_BOUNDARIES[$index]['max']) {
-            throw new \Exception('stepping out of allowed range');
+            throw new Exception('stepping out of allowed range');
         }
     }
 
