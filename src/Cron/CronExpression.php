@@ -76,13 +76,6 @@ class CronExpression
     ];
 
     /**
-     * Cron expression
-     *
-     * @var string
-     */
-    protected $expression;
-
-    /**
      * Time zone
      *
      * @var DateTimeZone|null
@@ -104,8 +97,13 @@ class CronExpression
      */
     public function __construct(string $expression, DateTimeZone $timeZone = null)
     {
-        $this->expression = trim($expression);
         $this->timeZone = $timeZone;
+
+        try {
+            $this->registers = $this->parse($expression);
+        } catch (Exception $e) {
+            $this->registers = null;
+        }
     }
 
     /**
@@ -211,17 +209,7 @@ class CronExpression
      */
     public function isValid(): bool
     {
-        $result = true;
-
-        if ($this->registers === null) {
-            try {
-                $this->registers = $this->parse();
-            } catch (Exception $e) {
-                $result = false;
-            }
-        }
-
-        return $result;
+        return null !== $this->registers;
     }
 
     /**
@@ -242,7 +230,7 @@ class CronExpression
         }
 
         try {
-            $result = $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
+            $result = null !== $this->registers && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
         } catch (Exception $e) {
             $result = false;
         }
@@ -259,7 +247,7 @@ class CronExpression
     {
         $result = true;
 
-        foreach ($this->parse() as $i => $item) {
+        foreach ($this->registers as $i => $item) {
             if (isset($item[(int)$segments[$i]]) === false) {
                 $result = false;
                 break;
@@ -272,12 +260,13 @@ class CronExpression
     /**
      * Parse whole cron expression
      *
+     * @param string $expression
      * @return array
      * @throws Exception
      */
-    private function parse(): array
+    private function parse(string $expression): array
     {
-        $segments = preg_split('/\s+/', $this->expression);
+        $segments = preg_split('/\s+/', trim($expression));
 
         if (is_array($segments) && sizeof($segments) === 5) {
             $registers = array_fill(0, 5, []);
