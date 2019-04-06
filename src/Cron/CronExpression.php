@@ -355,9 +355,13 @@ class CronExpression
     private function parseElement(array &$register, int $index, string $element)
     {
         $step = 1;
+        $segments = explode('/', $element);
 
-        if (false !== strpos($element, '/')) {
-            $step = $this->parseStepping($element, $index);
+        if (sizeof($segments) > 1) {
+            $this->validateStepping($segments, $index);
+
+            $element = (string)$segments[0];
+            $step = (int)$segments[1];
         }
 
         if (is_numeric($element)) {
@@ -392,23 +396,6 @@ class CronExpression
 
         $this->validateRange($range, $index);
         $this->fillRange($register, $index, $range, $stepping);
-    }
-
-    /**
-     * Parse stepping notation, e.g. "5-10/2" => 2
-     *
-     * @param int $index
-     * @param string $element
-     * @return int
-     * @throws Exception
-     */
-    private function parseStepping(string &$element, int $index): int
-    {
-        $segments = explode('/', $element);
-        $this->validateStepping($segments, $index);
-        $element = (string)$segments[0];
-
-        return (int)$segments[1];
     }
 
     /**
