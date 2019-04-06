@@ -419,17 +419,18 @@ class CronExpression
      */
     private function validateValue(string $value, int $index, int $step = 1)
     {
-        if (is_numeric($value)) {
-            if (intval($value) < self::VALUE_BOUNDARIES[$index]['min'] ||
-                intval($value) > self::VALUE_BOUNDARIES[$index]['max']) {
-                throw new Exception('value boundary exceeded');
-            }
-
-            if ($step !== 1) {
-                throw new Exception('invalid combination of value and stepping notation');
-            }
-        } else {
+        if ((string)$value !== (string)(int)$value) {
             throw new Exception('non-integer value');
+        }
+
+        if (intval($value) < self::VALUE_BOUNDARIES[$index]['min'] ||
+            intval($value) > self::VALUE_BOUNDARIES[$index]['max']
+        ) {
+            throw new Exception('value out of boundary');
+        }
+
+        if ($step !== 1) {
+            throw new Exception('invalid combination of value and stepping notation');
         }
     }
 
