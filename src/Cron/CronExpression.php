@@ -229,7 +229,7 @@ class CronExpression
             $now->setTimezone($this->timeZone);
         }
 
-        return null !== $this->registers && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
+        return $this->isValid() && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
     }
 
     /**
