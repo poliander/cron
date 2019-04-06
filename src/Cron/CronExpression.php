@@ -90,10 +90,8 @@ class CronExpression
     protected $registers = null;
 
     /**
-     * Class constructor sets cron expression property
-     *
-     * @param string $expression cron expression
-     * @param DateTimeZone|null $timeZone
+     * @param string $expression a cron expression, e.g. "* * * * *"
+     * @param DateTimeZone|null $timeZone time zone object
      */
     public function __construct(string $expression, DateTimeZone $timeZone = null)
     {
@@ -107,9 +105,9 @@ class CronExpression
     }
 
     /**
-     * Parse and validate cron expression
+     * Whether current cron expression has been parsed successfully
      *
-     * @return bool true if expression is valid, or false on error
+     * @return bool
      */
     public function isValid(): bool
     {
@@ -117,29 +115,29 @@ class CronExpression
     }
 
     /**
-     * Match current or given date/time against cron expression
+     * Match either "now", a given date/time object or a timestamp against current cron expression
      *
-     * @param mixed $now \DateTime object, timestamp or null
+     * @param mixed $when a DateTime object, a timestamp (int), or "now" if not set
      * @return bool
      * @throws Exception
      */
-    public function isMatching($now = null): bool
+    public function isMatching($when = null): bool
     {
-        if (false === ($now instanceof DateTime)) {
-            $now = (new DateTime())->setTimestamp($now === null ? time() : $now);
+        if (false === ($when instanceof DateTime)) {
+            $when = (new DateTime())->setTimestamp($when === null ? time() : $when);
         }
 
         if ($this->timeZone !== null) {
-            $now->setTimezone($this->timeZone);
+            $when->setTimezone($this->timeZone);
         }
 
-        return $this->isValid() && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
+        return $this->isValid() && $this->match(sscanf($when->format('i G j n w'), '%d %d %d %d %d'));
     }
 
     /**
      * Calculate next matching timestamp
      *
-     * @param mixed $start either a \DateTime object, a timestamp or null for current date/time
+     * @param mixed $start a DateTime object, a timestamp (int) or "now" if not set
      * @return int|bool next matching timestamp, or false on error
      * @throws Exception
      */
