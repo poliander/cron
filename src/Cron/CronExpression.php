@@ -365,12 +365,7 @@ class CronExpression
         }
 
         if (is_numeric($element)) {
-            $this->validateValue($element, $index);
-
-            if ($step !== 1) {
-                throw new Exception('invalid combination of value and stepping notation');
-            }
-
+            $this->validateValue($element, $index, $step);
             $register[intval($element)] = true;
         } else {
             $this->parseRange($register, $index, $element, $step);
@@ -419,14 +414,19 @@ class CronExpression
     /**
      * @param string $value
      * @param int $index
+     * @param int $step
      * @throws Exception
      */
-    private function validateValue(string $value, int $index)
+    private function validateValue(string $value, int $index, int $step = 1)
     {
         if (is_numeric($value)) {
             if (intval($value) < self::VALUE_BOUNDARIES[$index]['min'] ||
                 intval($value) > self::VALUE_BOUNDARIES[$index]['max']) {
                 throw new Exception('value boundary exceeded');
+            }
+
+            if ($step !== 1) {
+                throw new Exception('invalid combination of value and stepping notation');
             }
         } else {
             throw new Exception('non-integer value');
