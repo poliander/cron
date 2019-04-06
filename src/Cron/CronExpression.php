@@ -229,19 +229,12 @@ class CronExpression
             $now->setTimezone($this->timeZone);
         }
 
-        try {
-            $result = null !== $this->registers && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
-        } catch (Exception $e) {
-            $result = false;
-        }
-
-        return $result;
+        return null !== $this->registers && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
     }
 
     /**
      * @param array $segments
      * @return bool
-     * @throws Exception
      */
     private function match(array $segments): bool
     {
