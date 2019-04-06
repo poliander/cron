@@ -87,14 +87,14 @@ class CronExpression
      *
      * @var DateTimeZone|null
      */
-    protected $timeZone;
+    protected $timeZone = null;
 
     /**
      * Matching registers
      *
      * @var array|null
      */
-    protected $registers;
+    protected $registers = null;
 
     /**
      * Class constructor sets cron expression property
@@ -102,36 +102,10 @@ class CronExpression
      * @param string $expression cron expression
      * @param DateTimeZone|null $timeZone
      */
-    public function __construct(string $expression = '* * * * *', DateTimeZone $timeZone = null)
-    {
-        $this->setExpression($expression);
-        $this->setTimeZone($timeZone);
-    }
-
-    /**
-     * Set expression
-     *
-     * @param string $expression
-     * @return self
-     */
-    public function setExpression(string $expression): self
+    public function __construct(string $expression, DateTimeZone $timeZone = null)
     {
         $this->expression = trim($expression);
-        $this->registers = null;
-
-        return $this;
-    }
-
-    /**
-     * Set time zone
-     *
-     * @param DateTimeZone|null $timeZone
-     * @return self
-     */
-    public function setTimeZone(DateTimeZone $timeZone = null): self
-    {
         $this->timeZone = $timeZone;
-        return $this;
     }
 
     /**

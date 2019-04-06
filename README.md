@@ -62,3 +62,4 @@ $when = $expression->getNext();
 | 1.2.2 (2017-06-03) | fixed #3, #4 |
 | 2.0.0 (2017-11-30) | dropped PHP 5.x, added PHP 7.2 support, added vendor namespace (closes #2) |
 | 2.1.0 (2018-12-08) | dropped PHP 7.0, added PHP 7.3 support, updated PHPUnit dependency to 7.* |
+| master | dropped public setter methods to enforce immutability |
