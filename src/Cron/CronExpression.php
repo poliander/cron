@@ -386,7 +386,7 @@ class CronExpression
             $this->validateRange($range, $index);
         }
 
-        $this->fillRange($register, $index, $range, $stepping);
+        $this->fillRegisterFromRange($register, $index, $range, $stepping);
     }
 
     /**
@@ -463,40 +463,17 @@ class CronExpression
      * @param array $range
      * @param int $stepping
      */
-    private function fillRange(array &$register, int $index, array $range, int $stepping)
+    private function fillRegisterFromRange(array &$register, int $index, array $range, int $stepping)
     {
-        for ($i = self::VALUE_BOUNDARIES[$index]['min']; $i <= self::VALUE_BOUNDARIES[$index]['max']; $i++) {
-            if (($i - $range[0]) % $stepping === 0) {
-                if ($range[0] < $range[1]) {
-                    $this->fillRegisterBetweenBoundaries($register, $range, $i);
-                } else {
-                    $this->fillRegisterAcrossBoundaries($register, $range, $i);
-                }
-            }
-        }
-    }
+        $boundary = self::VALUE_BOUNDARIES[$index]['max'] + 1;
+        $length = $range[1] - $range[0];
 
-    /**
-     * @param array $register
-     * @param array $range
-     * @param int $value
-     */
-    private function fillRegisterAcrossBoundaries(array &$register, array $range, int $value)
-    {
-        if ($value >= $range[0] || $value <= $range[1]) {
-            $register[$value] = true;
+        if ($range[0] > $range[1]) {
+            $length += $boundary;
         }
-    }
 
-    /**
-     * @param array $register
-     * @param array $range
-     * @param int $value
-     */
-    private function fillRegisterBetweenBoundaries(array &$register, array $range, int $value)
-    {
-        if ($value >= $range[0] && $value <= $range[1]) {
-            $register[$value] = true;
+        for ($i = 0; $i <= $length; $i += $stepping) {
+            $register[($range[0] + $i) % $boundary] = true;
         }
     }
 }
