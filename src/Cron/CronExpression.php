@@ -107,6 +107,36 @@ class CronExpression
     }
 
     /**
+     * Parse and validate cron expression
+     *
+     * @return bool true if expression is valid, or false on error
+     */
+    public function isValid(): bool
+    {
+        return null !== $this->registers;
+    }
+
+    /**
+     * Match current or given date/time against cron expression
+     *
+     * @param mixed $now \DateTime object, timestamp or null
+     * @return bool
+     * @throws Exception
+     */
+    public function isMatching($now = null): bool
+    {
+        if (false === ($now instanceof DateTime)) {
+            $now = (new DateTime())->setTimestamp($now === null ? time() : $now);
+        }
+
+        if ($this->timeZone !== null) {
+            $now->setTimezone($this->timeZone);
+        }
+
+        return $this->isValid() && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
+    }
+
+    /**
      * Calculate next matching timestamp
      *
      * @param mixed $start either a \DateTime object, a timestamp or null for current date/time
@@ -200,36 +230,6 @@ class CronExpression
         }
 
         return $result;
-    }
-
-    /**
-     * Parse and validate cron expression
-     *
-     * @return bool true if expression is valid, or false on error
-     */
-    public function isValid(): bool
-    {
-        return null !== $this->registers;
-    }
-
-    /**
-     * Match current or given date/time against cron expression
-     *
-     * @param mixed $now \DateTime object, timestamp or null
-     * @return bool
-     * @throws Exception
-     */
-    public function isMatching($now = null): bool
-    {
-        if (false === ($now instanceof DateTime)) {
-            $now = (new DateTime())->setTimestamp($now === null ? time() : $now);
-        }
-
-        if ($this->timeZone !== null) {
-            $now->setTimezone($this->timeZone);
-        }
-
-        return $this->isValid() && $this->match(sscanf($now->format('i G j n w'), '%d %d %d %d %d'));
     }
 
     /**
@@ -350,6 +350,26 @@ class CronExpression
     }
 
     /**
+     * @param array $register
+     * @param int $index
+     * @param array $range
+     * @param int $stepping
+     */
+    private function fillRange(array &$register, int $index, array $range, int $stepping)
+    {
+        $boundary = self::VALUE_BOUNDARIES[$index]['max'] + self::VALUE_BOUNDARIES[$index]['mod'];
+        $length = $range[1] - $range[0];
+
+        if ($range[0] > $range[1]) {
+            $length += $boundary;
+        }
+
+        for ($i = 0; $i <= $length; $i += $stepping) {
+            $register[($range[0] + $i) % $boundary] = true;
+        }
+    }
+
+    /**
      * Validate whether a given range of values exceeds allowed value boundaries
      *
      * @param array $range
@@ -403,26 +423,6 @@ class CronExpression
 
         if ((int)$segments[1] < 1 || (int)$segments[1] > self::VALUE_BOUNDARIES[$index]['max']) {
             throw new Exception('stepping out of allowed range');
-        }
-    }
-
-    /**
-     * @param array $register
-     * @param int $index
-     * @param array $range
-     * @param int $stepping
-     */
-    private function fillRange(array &$register, int $index, array $range, int $stepping)
-    {
-        $boundary = self::VALUE_BOUNDARIES[$index]['max'] + self::VALUE_BOUNDARIES[$index]['mod'];
-        $length = $range[1] - $range[0];
-
-        if ($range[0] > $range[1]) {
-            $length += $boundary;
-        }
-
-        for ($i = 0; $i <= $length; $i += $stepping) {
-            $register[($range[0] + $i) % $boundary] = true;
         }
     }
 }
