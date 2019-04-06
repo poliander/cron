@@ -50,23 +50,28 @@ class CronExpression
     private const VALUE_BOUNDARIES = [
         0 => [
             'min' => 0,
-            'max' => 59
+            'max' => 59,
+            'mod' => 1
         ],
         1 => [
             'min' => 0,
-            'max' => 23
+            'max' => 23,
+            'mod' => 1
         ],
         2 => [
             'min' => 1,
-            'max' => 31
+            'max' => 31,
+            'mod' => 1
         ],
         3 => [
             'min' => 1,
-            'max' => 12
+            'max' => 12,
+            'mod' => 1
         ],
         4 => [
             'min' => 0,
-            'max' => 7
+            'max' => 7,
+            'mod' => 0
         ]
     ];
 
@@ -380,7 +385,7 @@ class CronExpression
     private function parseRange(array &$register, int $index, string $range, int $stepping)
     {
         if ($range === '*') {
-            $range = array_values(self::VALUE_BOUNDARIES[$index]);
+            $range = [self::VALUE_BOUNDARIES[$index]['min'], self::VALUE_BOUNDARIES[$index]['max']];
         } else {
             $range = explode('-', $range);
         }
@@ -465,7 +470,7 @@ class CronExpression
      */
     private function fillRange(array &$register, int $index, array $range, int $stepping)
     {
-        $boundary = self::VALUE_BOUNDARIES[$index]['max'] + 1;
+        $boundary = self::VALUE_BOUNDARIES[$index]['max'] + self::VALUE_BOUNDARIES[$index]['mod'];
         $length = $range[1] - $range[0];
 
         if ($range[0] > $range[1]) {
