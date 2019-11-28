@@ -45,11 +45,12 @@ $when = $expression->getNext();
 
 #### Supported PHP versions
 
-| PHP | cron version |
+| cron | PHP |
 | --- | ------------ |
-| 5.5 - 5.6 | 1.2.* |
-| 7.0 | 2.0.* |
-| 7.1 - 7.3 | 2.1.* |
+| 1.2.* | 5.5 - 5.6 |
+| 2.0.* | 7.0 |
+| 2.1.* | 7.1 |
+| 2.2.* | 7.2 - 7.4 |
 
 #### Changelog
 
@@ -62,4 +63,4 @@ $when = $expression->getNext();
 | 1.2.2 (2017-06-03) | fixed #3, #4 |
 | 2.0.0 (2017-11-30) | dropped PHP 5.x, added PHP 7.2 support, added vendor namespace (closes #2) |
 | 2.1.0 (2018-12-08) | dropped PHP 7.0, added PHP 7.3 support, updated PHPUnit dependency to 7.* |
-| master | dropped public setter methods, added testing with PHP 7.4snapshot |
+| master | dropped PHP 7.1, added PHP 7.4 support, updated PHPUnit dependency to 8.* |
