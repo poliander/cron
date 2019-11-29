@@ -284,7 +284,7 @@ class CronExpression
      * @param string $segment
      * @throws Exception
      */
-    private function parseSegment(array &$register, $index, $segment)
+    private function parseSegment(array &$register, $index, $segment): void
     {
         $allowed = [false, false, false, self::MONTH_NAMES, self::WEEKDAY_NAMES];
 
@@ -306,7 +306,7 @@ class CronExpression
      * @param string $element
      * @throws Exception
      */
-    private function parseElement(array &$register, int $index, string $element)
+    private function parseElement(array &$register, int $index, string $element): void
     {
         $step = 1;
         $segments = explode('/', $element);
@@ -335,7 +335,7 @@ class CronExpression
      * @param int $stepping
      * @throws Exception
      */
-    private function parseRange(array &$register, int $index, string $range, int $stepping)
+    private function parseRange(array &$register, int $index, string $range, int $stepping): void
     {
         if ($range === '*') {
             $range = [self::VALUE_BOUNDARIES[$index]['min'], self::VALUE_BOUNDARIES[$index]['max']];
@@ -353,7 +353,7 @@ class CronExpression
      * @param array $range
      * @param int $stepping
      */
-    private function fillRange(array &$register, int $index, array $range, int $stepping)
+    private function fillRange(array &$register, int $index, array $range, int $stepping): void
     {
         $boundary = self::VALUE_BOUNDARIES[$index]['max'] + self::VALUE_BOUNDARIES[$index]['mod'];
         $length = $range[1] - $range[0];
@@ -374,7 +374,7 @@ class CronExpression
      * @param int $index
      * @throws Exception
      */
-    private function validateRange(array $range, int $index)
+    private function validateRange(array $range, int $index): void
     {
         if (sizeof($range) !== 2) {
             throw new Exception('invalid range notation');
@@ -391,7 +391,7 @@ class CronExpression
      * @param int $step
      * @throws Exception
      */
-    private function validateValue(string $value, int $index, int $step = 1)
+    private function validateValue(string $value, int $index, int $step = 1): void
     {
         if ((string)$value !== (string)(int)$value) {
             throw new Exception('non-integer value');
@@ -413,7 +413,7 @@ class CronExpression
      * @param int $index
      * @throws Exception
      */
-    private function validateStepping(array $segments, int $index)
+    private function validateStepping(array $segments, int $index): void
     {
         if (sizeof($segments) !== 2) {
             throw new Exception('invalid stepping notation');
