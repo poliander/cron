@@ -64,3 +64,4 @@ $when = $expression->getNext();
 | 2.0.0 (2017-11-30) | dropped PHP 5.x, added PHP 7.2 support, added vendor namespace (closes #2) |
 | 2.1.0 (2018-12-08) | dropped PHP 7.0, added PHP 7.3 support, updated PHPUnit dependency to 7.* |
 | 2.2.0 (2019-12-03) | dropped PHP 7.1, added PHP 7.4 support, updated PHPUnit dependency to 8.* |
+| trunk | dropped PHP 7.2, added PHP 8.0 support, updated PHPUnit dependency to 9.* |
