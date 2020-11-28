@@ -10,7 +10,7 @@ build:
         override:
           - php-scrutinizer-run
   environment:
-    php: '7.2'
+    php: '7.4'
     postgresql: false
     redis: false
   tests:
