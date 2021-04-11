@@ -1,6 +1,6 @@
 ## PHP Cron Expression Parser
 
-[![Build Status](https://travis-ci.org/poliander/cron.svg?branch=master)](https://travis-ci.org/poliander/cron)
+[![Build Status](https://api.travis-ci.com/poliander/cron.svg?branch=master)](https://travis-ci.com/github/poliander/cron)
 [![Code Coverage](https://scrutinizer-ci.com/g/poliander/cron/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/poliander/cron/?branch=master)
 [![License](https://poser.pugx.org/poliander/cron/license)](https://packagist.org/packages/poliander/cron)
 [![Latest Stable Version](https://poser.pugx.org/poliander/cron/v/stable)](https://packagist.org/packages/poliander/cron)
