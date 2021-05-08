@@ -2,7 +2,7 @@
 
 [![Build Status](https://api.travis-ci.com/poliander/cron.svg?branch=master)](https://travis-ci.com/github/poliander/cron)
 [![Code Coverage](https://scrutinizer-ci.com/g/poliander/cron/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/poliander/cron/?branch=master)
-[![License](https://poser.pugx.org/poliander/cron/license)](https://packagist.org/packages/poliander/cron)
+[![License](https://poser.pugx.org/poliander/cron/license)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![Latest Stable Version](https://poser.pugx.org/poliander/cron/v/stable)](https://packagist.org/packages/poliander/cron)
 [![Total Downloads](https://poser.pugx.org/poliander/cron/downloads)](https://packagist.org/packages/poliander/cron)
 
