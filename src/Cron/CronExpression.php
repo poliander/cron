@@ -3,6 +3,7 @@
 namespace Cron;
 
 use \DateTime;
+use \DateTimeInterface;
 use \DateTimeZone;
 use \Exception;
 
@@ -123,7 +124,7 @@ class CronExpression
      */
     public function isMatching($when = null): bool
     {
-        if (false === ($when instanceof DateTime)) {
+        if (false === ($when instanceof DateTimeInterface)) {
             $when = (new DateTime())->setTimestamp($when === null ? time() : $when);
         }
 
@@ -146,7 +147,7 @@ class CronExpression
         $result = false;
 
         if ($this->isValid()) {
-            if ($start instanceof DateTime) {
+            if ($start instanceof DateTimeInterface) {
                 $timestamp = $start->getTimestamp();
             } elseif ((int)$start > 0) {
                 $timestamp = $start;
@@ -174,11 +175,11 @@ class CronExpression
     }
 
     /**
-     * @param DateTime $now
+     * @param DateTimeInterface $now
      * @param array $pointer
      * @return array
      */
-    private function adjust(DateTime $now, array &$pointer): array
+    private function adjust(DateTimeInterface $now, array &$pointer): array
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
@@ -205,11 +206,11 @@ class CronExpression
     }
 
     /**
-     * @param DateTime $now
+     * @param DateTimeInterface $now
      * @param array $current
      * @return bool
      */
-    private function forward(DateTime $now, array $current): bool
+    private function forward(DateTimeInterface $now, array $current): bool
     {
         $result = false;
 
