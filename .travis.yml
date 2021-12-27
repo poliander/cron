@@ -1,9 +1,11 @@
 language: php
 
+dist: bionic
+
 php:
-  - 7.4
-  - 8.0
-  - 8.1
+  - '7.4'
+  - '8.0'
+  - '8.1.0'
 
 before_script:
   - mkdir -p vendor
