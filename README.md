@@ -69,3 +69,4 @@ $when = $expression->getNext();
 | 2.3.0 (2020-12-29) | dropped PHP 7.2, added PHP 8.0 support, updated PHPUnit dependency to 9.* |
 | 2.3.1 (2021-10-04) | fixed #6 |
 | 2.4.0 (2021-12-27) | dropped PHP 7.3, added PHP 8.1 support |
+| 2.4.1 (2022-03-25) | fixed #9 |

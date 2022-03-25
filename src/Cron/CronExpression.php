@@ -147,16 +147,15 @@ class CronExpression
         $result = false;
 
         if ($this->isValid()) {
+            $now = new DateTime('now', $this->timeZone ?: new DateTimeZone('GMT'));
+
             if ($start instanceof DateTimeInterface) {
-                $timestamp = $start->getTimestamp();
+                $now->setTimestamp($start->getTimestamp());
             } elseif ((int)$start > 0) {
-                $timestamp = $start;
-            } else {
-                $timestamp = time();
+                $now->setTimestamp($start);
             }
 
-            $now = new DateTime('now', $this->timeZone);
-            $now->setTimestamp(intval(ceil($timestamp / 60)) * 60);
+            $now->setTimestamp(intval(ceil($now->getTimeStamp() / 60)) * 60);
 
             if ($this->isMatching($now)) {
                 $now->modify('+1 minute');
