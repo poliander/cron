@@ -147,20 +147,7 @@ class CronExpression
         $result = false;
 
         if ($this->isValid()) {
-            $now = new DateTime('now', $this->timeZone ?: new DateTimeZone('GMT'));
-
-            if ($start instanceof DateTimeInterface) {
-                $now->setTimestamp($start->getTimestamp());
-            } elseif ((int)$start > 0) {
-                $now->setTimestamp($start);
-            }
-
-            $now->setTimestamp(intval(ceil($now->getTimeStamp() / 60)) * 60);
-
-            if ($this->isMatching($now)) {
-                $now->modify('+1 minute');
-            }
-
+            $now = $this->toDateTime($start);
             $pointer = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
@@ -171,6 +158,29 @@ class CronExpression
         }
 
         return $result;
+    }
+
+    /**
+     * @param mixed $start a DateTime object, a timestamp (int) or "now" if not set
+     * @return DateTime
+     */
+    private function toDateTime($start): DateTime
+    {
+        $now = new DateTime('now', $this->timeZone ?: new DateTimeZone('GMT'));
+
+        if ($start instanceof DateTimeInterface) {
+            $now->setTimestamp($start->getTimestamp());
+        } elseif ((int)$start > 0) {
+            $now->setTimestamp($start);
+        }
+
+        $now->setTimestamp(intval(ceil($now->getTimeStamp() / 60)) * 60);
+
+        if ($this->isMatching($now)) {
+            $now->modify('+1 minute');
+        }
+
+        return $now;
     }
 
     /**
