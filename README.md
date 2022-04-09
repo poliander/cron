@@ -43,16 +43,16 @@ $expression = new \Cron\CronExpression('* * 13 * fri');
 $when = $expression->getNext();
 ```
 
-#### Supported PHP versions
+#### PHP versions
 
-| cron | PHP |
-| --- | ------------ |
-| 1.2.* | 5.5 - 5.6 |
-| 2.0.* | 7.0 |
-| 2.1.* | 7.1 |
-| 2.2.* | 7.2 |
-| 2.3.* | 7.3 |
-| 2.4.* | 7.4 - 8.1 |
+| cron  | PHP       | Note        |
+| ----- | --------- | ----------- |
+| 1.2.* | 5.6       | unsupported |
+| 2.0.* | 7.0       | unsupported |
+| 2.1.* | 7.1       | unsupported |
+| 2.2.* | 7.2       | unsupported |
+| 2.3.* | 7.3       | unsupported |
+| 2.4.* | 7.4 - 8.1 |             |
 
 #### Changelog
 
@@ -69,4 +69,5 @@ $when = $expression->getNext();
 | 2.3.0 (2020-12-29) | dropped PHP 7.2, added PHP 8.0 support, updated PHPUnit dependency to 9.* |
 | 2.3.1 (2021-10-04) | fixed #6 |
 | 2.4.0 (2021-12-27) | dropped PHP 7.3, added PHP 8.1 support |
-| 2.4.1 (2022-03-25) | fixed #9 |
+| 2.4.1 (2022-03-25) | ~~fixed #9~~ |
+| 2.4.2 (2022-04-09) | fixed #9, #10, #11 |
