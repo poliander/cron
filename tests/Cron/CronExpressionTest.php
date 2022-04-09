@@ -1,6 +1,6 @@
 <?php
 
-namespace Cron;
+namespace Poliander\Cron;
 
 use PHPUnit\Framework\TestCase;
 

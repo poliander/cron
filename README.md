@@ -19,27 +19,35 @@ composer require poliander/cron
 
 Validate a certain crontab expression:
 ```php
-$expression = new \Cron\CronExpression('15,45 */2 * * *');
+use Poliander\Cron\CronExpression;
+
+$expression = new CronExpression('15,45 */2 * * *');
 $isValid = $expression->isValid(); // returns true
 ```
 
 Check whether a given point in time is matching a certain cron expression:
 ```php
-$expression = new \Cron\CronExpression('45 9 * * *');
+use Poliander\Cron\CronExpression;
+
+$expression = new CronExpression('45 9 * * *');
 $dt = new \DateTime('2014-05-18 09:45');
 $isMatching = $expression->isMatching($dt); // returns true
 ```
 
 Match an expression across different time zones:
 ```php
-$expression = new \Cron\CronExpression('45 9 * * *', new DateTimeZone('Europe/Berlin'));
+use Poliander\Cron\CronExpression;
+
+$expression = new CronExpression('45 9 * * *', new DateTimeZone('Europe/Berlin'));
 $dt = new \DateTime('2014-05-18 08:45', new DateTimeZone('Europe/London'));
 $isMatching = $expression->isMatching($dt); // returns true
 ```
 
 Calculate next timestamp matching a Friday, the 13th:
 ```php
-$expression = new \Cron\CronExpression('* * 13 * fri');
+use Poliander\Cron\CronExpression;
+
+$expression = new CronExpression('* * 13 * fri');
 $when = $expression->getNext();
 ```
 
@@ -53,6 +61,7 @@ $when = $expression->getNext();
 | 2.2.* | 7.2       | unsupported |
 | 2.3.* | 7.3       | unsupported |
 | 2.4.* | 7.4 - 8.1 |             |
+| 3.0.* | 7.4 - 8.1 |             |
 
 #### Changelog
 
@@ -71,3 +80,4 @@ $when = $expression->getNext();
 | 2.4.0 (2021-12-27) | dropped PHP 7.3, added PHP 8.1 support |
 | 2.4.1 (2022-03-25) | ~~fixed #9~~ |
 | 2.4.2 (2022-04-09) | fixed #9, #10, #11 |
+| 3.0.0 (2022-04-09) | namespace changed to avoid package conflict (closes #8) |

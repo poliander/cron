@@ -18,11 +18,11 @@
   },
   "autoload": {
     "psr-4": {
-      "Cron\\": "src/Cron/"
+      "Poliander\\Cron\\": "src/Cron/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Cron\\": "tests/Cron/"
+      "Poliander\\Cron\\": "tests/Cron/"
     }
 }}
