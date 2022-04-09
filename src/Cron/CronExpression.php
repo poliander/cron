@@ -174,7 +174,7 @@ class CronExpression
             $now->setTimestamp($start);
         }
 
-        $now->setTimestamp(intval(ceil($now->getTimeStamp() / 60)) * 60);
+        $now->setTimestamp($now->getTimeStamp() - $now->getTimeStamp() % 60);
 
         if ($this->isMatching($now)) {
             $now->modify('+1 minute');
@@ -191,7 +191,7 @@ class CronExpression
     private function adjust(DateTimeInterface $now, array &$pointer): array
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
-
+        //print_r($current);
         if ($pointer[1] !== $current[1]) {
             $pointer[1] = $current[1];
             $now->setTime($current[1], 0);

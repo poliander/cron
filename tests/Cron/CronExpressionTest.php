@@ -159,7 +159,8 @@ class CronExpressionTest extends TestCase
             ['1 0 * * *', 1496223073, 1496268060],
             ['1,2 * * * *', 1535234400, 1535234460], // at 00:00, 00:01 is expected
             ['1,2 * * * *', 1535234460, 1535234520], // at 00:01, 00:02 is expected
-            ['1,2 * * * *', 1535234520, 1535238060],   // at 00:02, 01:01 is expected
+            ['1,2 * * * *', 1535234520, 1535238060], // at 00:02, 01:01 is expected
+            ['0 3 * * *', 1649203201, 1649206800],
         ];
     }
 
@@ -181,7 +182,12 @@ class CronExpressionTest extends TestCase
     public function testGetNextWithoutParameter()
     {
         $cron = new CronExpression('* * * * *');
-        $this->assertEquals(ceil((60 + time()) / 60) * 60, $cron->getNext());
+
+        $now = time();
+        $now = $now - $now % 60; // truncate seconds from current timestamp
+        $next = $now + 60; // next minute
+
+        $this->assertEquals($next, $cron->getNext());
     }
 
     public function testGetNextWithTimestamp()
