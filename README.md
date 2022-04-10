@@ -71,3 +71,4 @@ $when = $expression->getNext();
 | 2.4.0 (2021-12-27) | dropped PHP 7.3, added PHP 8.1 support |
 | 2.4.1 (2022-03-25) | ~~fixed #9~~ |
 | 2.4.2 (2022-04-09) | fixed #9, #10, #11 |
+| 2.4.3 (2022-04-10) | fixed #12 |
