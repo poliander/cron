@@ -144,20 +144,20 @@ class CronExpression
      */
     public function getNext($start = null)
     {
-        $result = false;
-
         if ($this->isValid()) {
             $now = $this->toDateTime($start);
+            $now->setTimezone($this->timeZone ?: new DateTimeZone(date_default_timezone_get()));
+
             $pointer = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
                 $current = $this->adjust($now, $pointer);
             } while ($this->forward($now, $current));
 
-            $result = $now->getTimestamp();
+            return $now->getTimestamp();
         }
 
-        return $result;
+        return false;
     }
 
     /**
@@ -166,12 +166,12 @@ class CronExpression
      */
     private function toDateTime($start): DateTime
     {
-        $now = new DateTime('now', $this->timeZone ?: new DateTimeZone('GMT'));
-
         if ($start instanceof DateTimeInterface) {
-            $now->setTimestamp($start->getTimestamp());
+            $now = $start;
         } elseif ((int)$start > 0) {
-            $now->setTimestamp($start);
+            $now = new DateTime('@' . $start);
+        } else {
+            $now = new DateTime('@' . time());
         }
 
         $now->setTimestamp($now->getTimeStamp() - $now->getTimeStamp() % 60);
@@ -229,10 +229,10 @@ class CronExpression
         } elseif (false === (isset($this->registers[2][$current[2]]) && isset($this->registers[4][$current[5]]))) {
             $now->modify('+1 day');
             $result = true;
-        } elseif (isset($this->registers[1][$current[1]]) === false) {
-            $now->modify('+1 hour');
-            $result = true;
-        } elseif (isset($this->registers[0][$current[0]]) === false) {
+        } elseif (
+            isset($this->registers[0][$current[0]]) === false ||
+            isset($this->registers[1][$current[1]]) === false
+        ) {
             $now->modify('+1 minute');
             $result = true;
         }
