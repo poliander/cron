@@ -195,9 +195,6 @@ class CronExpression
         if ($pointer[0] !== $current[0] || $pointer[1] !== $current[1]) {
             $pointer[0] = $current[0];
             $now->setTime($current[1], $current[0]);
-        } elseif ($pointer[1] !== $current[1]) {
-            $pointer[1] = $current[1];
-            $now->setTime($current[1], 0);
         } elseif ($pointer[4] !== $current[4]) {
             $pointer[4] = $current[4];
             $now->setDate($current[4], 1, 1);
