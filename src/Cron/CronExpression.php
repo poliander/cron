@@ -192,12 +192,12 @@ class CronExpression
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-        if ($pointer[1] !== $current[1]) {
-            $pointer[1] = $current[1];
-            $now->setTime($current[1], 0);
-        } elseif ($pointer[0] !== $current[0]) {
+        if ($pointer[0] !== $current[0] || $pointer[1] !== $current[1]) {
             $pointer[0] = $current[0];
             $now->setTime($current[1], $current[0]);
+        } elseif ($pointer[1] !== $current[1]) {
+            $pointer[1] = $current[1];
+            $now->setTime($current[1], 0);
         } elseif ($pointer[4] !== $current[4]) {
             $pointer[4] = $current[4];
             $now->setDate($current[4], 1, 1);
@@ -221,23 +221,21 @@ class CronExpression
      */
     private function forward(DateTimeInterface $now, array $current): bool
     {
-        $result = false;
-
         if (isset($this->registers[3][$current[3]]) === false) {
             $now->modify('+1 month');
-            $result = true;
+            return true;
         } elseif (false === (isset($this->registers[2][$current[2]]) && isset($this->registers[4][$current[5]]))) {
             $now->modify('+1 day');
-            $result = true;
-        } elseif (
-            isset($this->registers[0][$current[0]]) === false ||
-            isset($this->registers[1][$current[1]]) === false
-        ) {
+            return true;
+        } elseif (isset($this->registers[0][$current[0]]) === false) {
             $now->modify('+1 minute');
-            $result = true;
+            return true;
+        } elseif (isset($this->registers[1][$current[1]]) === false) {
+            $now->modify('+1 hour');
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
     /**
