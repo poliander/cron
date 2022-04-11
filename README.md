@@ -81,6 +81,7 @@ $when = $expression->getNext();
 | 2.4.1 (2022-03-25) | ~~fixed #9~~ |
 | 2.4.2 (2022-04-09) | fixed #9, #10, #11 |
 | 2.4.3 (2022-04-10) | fixed #12 |
+| 2.4.4 (2022-04-11) | fixed #13 |
 | 3.0.0 (2022-04-09) | namespace changed to avoid package conflict (closes #8) |
 | 3.0.1 (2022-04-10) | fixed #12 |
 | 3.0.2 (2022-04-11) | fixed #13 |
