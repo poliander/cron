@@ -146,7 +146,6 @@ class CronExpression
     {
         if ($this->isValid()) {
             $now = $this->toDateTime($start);
-
             $pointer = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
