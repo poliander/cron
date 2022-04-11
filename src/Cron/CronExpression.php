@@ -146,7 +146,6 @@ class CronExpression
     {
         if ($this->isValid()) {
             $now = $this->toDateTime($start);
-            $now->setTimezone($this->timeZone ?: new DateTimeZone(date_default_timezone_get()));
 
             $pointer = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
@@ -175,6 +174,7 @@ class CronExpression
         }
 
         $now->setTimestamp($now->getTimeStamp() - $now->getTimeStamp() % 60);
+        $now->setTimezone($this->timeZone ?: new DateTimeZone(date_default_timezone_get()));
 
         if ($this->isMatching($now)) {
             $now->modify('+1 minute');
@@ -194,6 +194,7 @@ class CronExpression
 
         if ($pointer[0] !== $current[0] || $pointer[1] !== $current[1]) {
             $pointer[0] = $current[0];
+            $pointer[1] = $current[1];
             $now->setTime($current[1], $current[0]);
         } elseif ($pointer[4] !== $current[4]) {
             $pointer[4] = $current[4];
