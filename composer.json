@@ -3,7 +3,7 @@
   "description": "Standard (V7) compliant crontab expression parser/validator with support for time zones",
   "type": "library",
   "homepage": "https://github.com/poliander/cron",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
   "authors": [
     {
       "name": "René Pollesch",
@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "php": "^7.4 || ^8.0 || ^8.1"
+    "php": "7.4.* || 8.0.* || 8.1.*"
   },
   "require-dev": {
     "phpunit/phpunit": "~9.0"
