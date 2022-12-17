@@ -239,16 +239,13 @@ class CronExpression
      */
     private function match(array $segments): bool
     {
-        $result = true;
-
         foreach ($this->registers as $i => $item) {
             if (isset($item[(int)$segments[$i]]) === false) {
-                $result = false;
-                break;
+                return false;
             }
         }
 
-        return $result;
+        return true;
     }
 
     /**
