@@ -146,11 +146,11 @@ class CronExpression
     {
         if ($this->isValid()) {
             $now = $this->toDateTime($start);
-            $pos = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
+            $pos = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-            do {
-                $this->update($now, $pos);
-            } while ($this->forward($now, $pos));
+            while ($this->increase($now, $pos)) {
+                $this->reset($now, $pos);
+            }
 
             return $now->getTimestamp();
         }
@@ -183,10 +183,37 @@ class CronExpression
     }
 
     /**
+     * Increases the timestamp in step sizes depending on which segment(s) of the cron pattern are matching.
+     * Returns FALSE if the cron pattern is matching and thus no further cycle is required.
+     *
+     * @param DateTimeInterface $now
+     * @param array $pos
+     * @return bool
+     */
+    private function increase(DateTimeInterface $now, array $pos): bool
+    {
+        if (isset($this->registers[3][$pos[3]]) === false) {
+            $now->modify('+1 month');
+            return true;
+        } elseif (false === (isset($this->registers[2][$pos[2]]) && isset($this->registers[4][$pos[5]]))) {
+            $now->modify('+1 day');
+            return true;
+        } elseif (isset($this->registers[0][$pos[0]]) === false) {
+            $now->modify('+1 minute');
+            return true;
+        } elseif (isset($this->registers[1][$pos[1]]) === false) {
+            $now->modify('+1 hour');
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param DateTimeInterface $now
      * @param array $pos
      */
-    private function update(DateTimeInterface $now, array &$pos): void
+    private function reset(DateTimeInterface $now, array &$pos): void
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
@@ -201,36 +228,9 @@ class CronExpression
         } elseif ($pos[2] !== $current[2]) {
             // next day, reset hour/minute
             $now->setTime(0, 0);
-        } else {
-            // update hour/minute
-            $now->setTime($current[1], $current[0]);
         }
 
         $pos = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
-    }
-
-    /**
-     * @param DateTimeInterface $now
-     * @param array $current
-     * @return bool
-     */
-    private function forward(DateTimeInterface $now, array $current): bool
-    {
-        if (isset($this->registers[3][$current[3]]) === false) {
-            $now->modify('+1 month');
-            return true;
-        } elseif (false === (isset($this->registers[2][$current[2]]) && isset($this->registers[4][$current[5]]))) {
-            $now->modify('+1 day');
-            return true;
-        } elseif (isset($this->registers[0][$current[0]]) === false) {
-            $now->modify('+1 minute');
-            return true;
-        } elseif (isset($this->registers[1][$current[1]]) === false) {
-            $now->modify('+1 hour');
-            return true;
-        }
-
-        return false;
     }
 
     /**
