@@ -146,11 +146,11 @@ class CronExpression
     {
         if ($this->isValid()) {
             $now = $this->toDateTime($start);
-            $pointer = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
+            $pos = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
-                $current = $this->adjust($now, $pointer);
-            } while ($this->forward($now, $current));
+                $this->adjust($now, $pos);
+            } while ($this->forward($now, $pos));
 
             return $now->getTimestamp();
         }
@@ -184,31 +184,28 @@ class CronExpression
 
     /**
      * @param DateTimeInterface $now
-     * @param array $pointer
-     * @return array
+     * @param array $pos
      */
-    private function adjust(DateTimeInterface $now, array &$pointer): array
+    private function adjust(DateTimeInterface $now, array &$pos): void
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-        if ($pointer[0] !== $current[0] || $pointer[1] !== $current[1]) {
-            $pointer[0] = $current[0];
-            $pointer[1] = $current[1];
+        if ($pos[0] !== $current[0] || $pos[1] !== $current[1]) {
             $now->setTime($current[1], $current[0]);
-        } elseif ($pointer[4] !== $current[4]) {
-            $pointer[4] = $current[4];
-            $now->setDate($current[4], 1, 1);
+        } elseif ($pos[2] !== $current[2]) {
+            // next day, reset hour/minute
             $now->setTime(0, 0);
-        } elseif ($pointer[3] !== $current[3]) {
-            $pointer[3] = $current[3];
+        } elseif ($pos[3] !== $current[3]) {
+            // next month, reset day/hour/minute
+            $now->setTime(0, 0);
             $now->setDate($current[4], $current[3], 1);
+        } elseif ($pos[4] !== $current[4]) {
+            // next year, reset month/day/hour/minute
             $now->setTime(0, 0);
-        } elseif ($pointer[2] !== $current[2]) {
-            $pointer[2] = $current[2];
-            $now->setTime(0, 0);
+            $now->setDate($current[4], 1, 1);
         }
 
-        return $current;
+        $pos = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
     }
 
     /**
