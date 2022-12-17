@@ -190,20 +190,20 @@ class CronExpression
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-        if ($pos[0] !== $current[0] || $pos[1] !== $current[1]) {
-            // update hour/minute
-            $now->setTime($current[1], $current[0]);
-        } elseif ($pos[2] !== $current[2]) {
-            // next day, reset hour/minute
+        if ($pos[4] !== $current[4]) {
+            // next year, reset month/day/hour/minute
             $now->setTime(0, 0);
+            $now->setDate($current[4], 1, 1);
         } elseif ($pos[3] !== $current[3]) {
             // next month, reset day/hour/minute
             $now->setTime(0, 0);
             $now->setDate($current[4], $current[3], 1);
-        } elseif ($pos[4] !== $current[4]) {
-            // next year, reset month/day/hour/minute
+        } elseif ($pos[2] !== $current[2]) {
+            // next day, reset hour/minute
             $now->setTime(0, 0);
-            $now->setDate($current[4], 1, 1);
+        } else {
+            // update hour/minute
+            $now->setTime($current[1], $current[0]);
         }
 
         $pos = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
