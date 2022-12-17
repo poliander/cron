@@ -149,7 +149,7 @@ class CronExpression
             $pos = sscanf($now->format('i G j n Y'), '%d %d %d %d %d');
 
             do {
-                $this->adjust($now, $pos);
+                $this->update($now, $pos);
             } while ($this->forward($now, $pos));
 
             return $now->getTimestamp();
@@ -186,11 +186,12 @@ class CronExpression
      * @param DateTimeInterface $now
      * @param array $pos
      */
-    private function adjust(DateTimeInterface $now, array &$pos): void
+    private function update(DateTimeInterface $now, array &$pos): void
     {
         $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
 
         if ($pos[0] !== $current[0] || $pos[1] !== $current[1]) {
+            // update hour/minute
             $now->setTime($current[1], $current[0]);
         } elseif ($pos[2] !== $current[2]) {
             // next day, reset hour/minute
