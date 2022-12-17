@@ -145,14 +145,14 @@ class CronExpression
     public function getNext($start = null)
     {
         if ($this->isValid()) {
-            $now = $this->toDateTime($start);
-            $pos = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
+            $next = $this->toDateTime($start);
+            $pos = sscanf($next->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-            while ($this->increase($now, $pos)) {
-                $this->reset($now, $pos);
+            while ($this->increase($next, $pos)) {
+                $this->reset($next, $pos);
             }
 
-            return $now->getTimestamp();
+            return $next->getTimestamp();
         }
 
         return false;
@@ -165,44 +165,44 @@ class CronExpression
     private function toDateTime($start): DateTime
     {
         if ($start instanceof DateTimeInterface) {
-            $now = $start;
+            $next = $start;
         } elseif ((int)$start > 0) {
-            $now = new DateTime('@' . $start);
+            $next = new DateTime('@' . $start);
         } else {
-            $now = new DateTime('@' . time());
+            $next = new DateTime('@' . time());
         }
 
-        $now->setTimestamp($now->getTimeStamp() - $now->getTimeStamp() % 60);
-        $now->setTimezone($this->timeZone ?: new DateTimeZone(date_default_timezone_get()));
+        $next->setTimestamp($next->getTimeStamp() - $next->getTimeStamp() % 60);
+        $next->setTimezone($this->timeZone ?: new DateTimeZone(date_default_timezone_get()));
 
-        if ($this->isMatching($now)) {
-            $now->modify('+1 minute');
+        if ($this->isMatching($next)) {
+            $next->modify('+1 minute');
         }
 
-        return $now;
+        return $next;
     }
 
     /**
      * Increases the timestamp in step sizes depending on which segment(s) of the cron pattern are matching.
      * Returns FALSE if the cron pattern is matching and thus no further cycle is required.
      *
-     * @param DateTimeInterface $now
+     * @param DateTimeInterface $next
      * @param array $pos
      * @return bool
      */
-    private function increase(DateTimeInterface $now, array $pos): bool
+    private function increase(DateTimeInterface $next, array $pos): bool
     {
         if (isset($this->registers[3][$pos[3]]) === false) {
-            $now->modify('+1 month');
+            $next->modify('+1 month');
             return true;
         } elseif (false === (isset($this->registers[2][$pos[2]]) && isset($this->registers[4][$pos[5]]))) {
-            $now->modify('+1 day');
+            $next->modify('+1 day');
             return true;
         } elseif (isset($this->registers[0][$pos[0]]) === false) {
-            $now->modify('+1 minute');
+            $next->modify('+1 minute');
             return true;
         } elseif (isset($this->registers[1][$pos[1]]) === false) {
-            $now->modify('+1 hour');
+            $next->modify('+1 hour');
             return true;
         }
 
@@ -210,27 +210,27 @@ class CronExpression
     }
 
     /**
-     * @param DateTimeInterface $now
+     * @param DateTimeInterface $next
      * @param array $pos
      */
-    private function reset(DateTimeInterface $now, array &$pos): void
+    private function reset(DateTimeInterface $next, array &$pos): void
     {
-        $current = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
+        $current = sscanf($next->format('i G j n Y w'), '%d %d %d %d %d %d');
 
         if ($pos[4] !== $current[4]) {
             // next year, reset month/day/hour/minute
-            $now->setTime(0, 0);
-            $now->setDate($current[4], 1, 1);
+            $next->setTime(0, 0);
+            $next->setDate($current[4], 1, 1);
         } elseif ($pos[3] !== $current[3]) {
             // next month, reset day/hour/minute
-            $now->setTime(0, 0);
-            $now->setDate($current[4], $current[3], 1);
+            $next->setTime(0, 0);
+            $next->setDate($current[4], $current[3], 1);
         } elseif ($pos[2] !== $current[2]) {
             // next day, reset hour/minute
-            $now->setTime(0, 0);
+            $next->setTime(0, 0);
         }
 
-        $pos = sscanf($now->format('i G j n Y w'), '%d %d %d %d %d %d');
+        $pos = sscanf($next->format('i G j n Y w'), '%d %d %d %d %d %d');
     }
 
     /**
