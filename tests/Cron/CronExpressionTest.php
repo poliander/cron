@@ -135,6 +135,12 @@ class CronExpressionTest extends TestCase
         ];
     }
 
+    public function testGetNextWithInvalidExpression()
+    {
+        $what = new CronExpression('foobar', new DateTimeZone('Europe/Berlin'));
+        $this->assertEquals(false, $what->getNext(1649750400));
+    }
+
     /**
      * @param string $expression
      * @param int $timestampCurrent
