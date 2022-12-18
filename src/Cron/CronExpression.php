@@ -90,6 +90,8 @@ class CronExpression
      */
     protected $registers = null;
 
+    protected $expression;
+
     /**
      * @param string $expression a cron expression, e.g. "* * * * *"
      * @param DateTimeZone|null $timeZone time zone object
@@ -97,6 +99,7 @@ class CronExpression
     public function __construct(string $expression, DateTimeZone $timeZone = null)
     {
         $this->timeZone = $timeZone;
+        $this->expression = $expression;
 
         try {
             $this->registers = $this->parse($expression);
@@ -146,11 +149,10 @@ class CronExpression
     {
         if ($this->isValid()) {
             $next = $this->toDateTime($start);
-            $pos = sscanf($next->format('i G j n Y w'), '%d %d %d %d %d %d');
 
-            while ($this->increase($next, $pos)) {
-                $this->reset($next, $pos);
-            }
+            do {
+                $pos = sscanf($next->format('i G j n Y w'), '%d %d %d %d %d %d');
+            } while ($this->increase($next, $pos));
 
             return $next->getTimestamp();
         }
@@ -192,45 +194,35 @@ class CronExpression
      */
     private function increase(DateTimeInterface $next, array $pos): bool
     {
-        if (isset($this->registers[3][$pos[3]]) === false) {
-            $next->modify('+1 month');
-            return true;
-        } elseif (false === (isset($this->registers[2][$pos[2]]) && isset($this->registers[4][$pos[5]]))) {
-            $next->modify('+1 day');
-            return true;
-        } elseif (isset($this->registers[0][$pos[0]]) === false) {
-            $next->modify('+1 minute');
-            return true;
-        } elseif (isset($this->registers[1][$pos[1]]) === false) {
-            $next->modify('+1 hour');
-            return true;
+        switch (true) {
+            case false === isset($this->registers[3][$pos[3]]):
+                // next month, reset day/hour/minute
+                $next->setTime(0, 0);
+                $next->setDate($pos[4], $pos[3], 1);
+                $next->modify('+1 month');
+                return true;
+
+            case false === (isset($this->registers[2][$pos[2]]) && isset($this->registers[4][$pos[5]])):
+                // next day, reset hour/minute
+                $next->setTime(0, 0);
+                $next->modify('+1 day');
+                return true;
+
+            case false === isset($this->registers[1][$pos[1]]):
+                // next hour, reset minute
+                $next->setTime($pos[1], 0);
+                $next->modify('+1 hour');
+                return true;
+
+            case false === isset($this->registers[0][$pos[0]]):
+                // next minute
+                $next->modify('+1 minute');
+                return true;
+
+            default:
+                // all segments are matching
+                return false;
         }
-
-        return false;
-    }
-
-    /**
-     * @param DateTimeInterface $next
-     * @param array $pos
-     */
-    private function reset(DateTimeInterface $next, array &$pos): void
-    {
-        $current = sscanf($next->format('i G j n Y w'), '%d %d %d %d %d %d');
-
-        if ($pos[4] !== $current[4]) {
-            // next year, reset month/day/hour/minute
-            $next->setTime(0, 0);
-            $next->setDate($current[4], 1, 1);
-        } elseif ($pos[3] !== $current[3]) {
-            // next month, reset day/hour/minute
-            $next->setTime(0, 0);
-            $next->setDate($current[4], $current[3], 1);
-        } elseif ($pos[2] !== $current[2]) {
-            // next day, reset hour/minute
-            $next->setTime(0, 0);
-        }
-
-        $pos = sscanf($next->format('i G j n Y w'), '%d %d %d %d %d %d');
     }
 
     /**
