@@ -20,7 +20,7 @@ build:
               format: 'clover'
 
   environment:
-    php: '7.4'
+    php: '8.1'
     postgresql: false
     redis: false
 
