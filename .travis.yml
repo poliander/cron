@@ -1,6 +1,6 @@
 language: php
 
-dist: focal
+dist: bionic
 
 php:
   - '8.0'
