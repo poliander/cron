@@ -61,8 +61,7 @@ $when = $expression->getNext();
 | 2.2.* | 7.2       | end of life |
 | 2.3.* | 7.3       | end of life |
 | 2.4.* | 7.4 - 8.2 |             |
-| 3.0.* | 7.4 - 8.1 | end of life |
-| 3.1.* | 8.0 - 8.2 |             |
+| 3.0.* | 7.4 - 8.2 |             |
 
 #### Changelog
 
@@ -89,4 +88,4 @@ $when = $expression->getNext();
 | 3.0.1 (2022-04-10) | fixed #12 |
 | 3.0.2 (2022-04-11) | fixed #13 |
 | 3.0.3 (2022-12-17) | fixed #14 |
-| 3.1.0 (2022-12-29) | added PHP 8.2 support, dropped PHP 7.4 support |
+| 3.0.4 (2022-12-29) | added PHP 8.2 support |
