@@ -7,6 +7,9 @@ php:
   - '8.1'
   - '8.2'
 
+before_install:
+  - sudo apt-get -y install libonig4
+
 before_script:
   - mkdir -p vendor
   - curl -s http://getcomposer.org/installer | php
