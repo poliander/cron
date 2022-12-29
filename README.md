@@ -52,7 +52,7 @@ $when = $expression->getNext();
 | 2.1.* | 7.1       | unsupported |
 | 2.2.* | 7.2       | unsupported |
 | 2.3.* | 7.3       | unsupported |
-| 2.4.* | 7.4 - 8.1 |             |
+| 2.4.* | 7.4 - 8.2 |             |
 
 #### Changelog
 
@@ -74,3 +74,4 @@ $when = $expression->getNext();
 | 2.4.3 (2022-04-10) | fixed #12 |
 | 2.4.4 (2022-04-11) | fixed #13 |
 | 2.4.5 (2022-12-17) | fixed #14 |
+| 2.4.6 (2022-12-29) | added PHP 8.2 support |
