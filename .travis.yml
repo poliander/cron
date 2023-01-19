@@ -2,14 +2,16 @@ language: php
 
 dist: bionic
 
+addons:
+  apt:
+    packages:
+      - libonig4
+
 php:
   - '7.4'
   - '8.0'
   - '8.1'
   - '8.2'
-
-before_install:
-  - sudo apt-get -y install libonig4
 
 before_script:
   - mkdir -p vendor
