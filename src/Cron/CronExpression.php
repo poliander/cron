@@ -284,7 +284,7 @@ class CronExpression
      * @param string $segment
      * @throws Exception
      */
-    private function parseSegment(array &$register, $index, $segment): void
+    private function parseSegment(array &$register, int $index, string $segment): void
     {
         $allowed = [false, false, false, self::MONTH_NAMES, self::WEEKDAY_NAMES];
 
@@ -338,13 +338,13 @@ class CronExpression
     private function parseRange(array &$register, int $index, string $range, int $stepping): void
     {
         if ($range === '*') {
-            $range = [self::VALUE_BOUNDARIES[$index]['min'], self::VALUE_BOUNDARIES[$index]['max']];
+            $rangeArr = [self::VALUE_BOUNDARIES[$index]['min'], self::VALUE_BOUNDARIES[$index]['max']];
         } else {
-            $range = explode('-', $range);
+            $rangeArr = explode('-', $range);
         }
 
-        $this->validateRange($range, $index);
-        $this->fillRange($register, $index, $range, $stepping);
+        $this->validateRange($rangeArr, $index);
+        $this->fillRange($register, $index, $rangeArr, $stepping);
     }
 
     /**
