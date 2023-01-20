@@ -75,3 +75,4 @@ $when = $expression->getNext();
 | 2.4.4 (2022-04-11) | fixed #13 |
 | 2.4.5 (2022-12-17) | fixed #14 |
 | 2.4.6 (2022-12-29) | added PHP 8.2 support |
+| 2.4.7 (2023-01-20) | fixed #16 |
