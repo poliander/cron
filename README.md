@@ -84,8 +84,10 @@ $when = $expression->getNext();
 | 2.4.4 (2022-04-11) | fixed #13 |
 | 2.4.5 (2022-12-17) | fixed #14 |
 | 2.4.6 (2022-12-29) | added PHP 8.2 support |
+| 2.4.7 (2023-01-20) | fixed #16 |
 | 3.0.0 (2022-04-09) | namespace changed to avoid package conflict (closes #8) |
 | 3.0.1 (2022-04-10) | fixed #12 |
 | 3.0.2 (2022-04-11) | fixed #13 |
 | 3.0.3 (2022-12-17) | fixed #14 |
 | 3.0.4 (2022-12-29) | added PHP 8.2 support |
+| 3.0.5 (2023-01-20) | fixed #16 |
