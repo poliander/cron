@@ -8,6 +8,15 @@
 
 Standard (V7) compliant crontab expression parser/validator with support for time zones; see "[man 5 crontab](http://www.unix.com/man-page/linux/5/crontab/)" for possible expressions.
 
+<!-- toc -->
+
+- [Installation](#installation)
+- [Examples](#examples)
+- [Supported PHP Versions](#supported-php-versions)
+- [Changelog](#changelog)
+
+<!-- tocstop -->
+
 ## Installation
 
 Using composer, add a requirement for `poliander/cron` to your `composer.json` file:
