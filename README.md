@@ -1,4 +1,4 @@
-## PHP Cron Expression Parser
+# PHP Cron Expression Parser
 
 [![Build Status](https://api.travis-ci.com/poliander/cron.svg?branch=main)](https://travis-ci.com/github/poliander/cron)
 [![Code Coverage](https://scrutinizer-ci.com/g/poliander/cron/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/poliander/cron/?branch=main)
@@ -8,14 +8,14 @@
 
 Standard (V7) compliant crontab expression parser/validator with support for time zones; see "[man 5 crontab](http://www.unix.com/man-page/linux/5/crontab/)" for possible expressions.
 
-#### Installation
+## Installation
 
 Using composer, add a requirement for `poliander/cron` to your `composer.json` file:
 ```
 composer require poliander/cron
 ```
 
-#### Examples
+## Examples
 
 Validate a certain crontab expression:
 ```php
@@ -51,7 +51,7 @@ $expression = new CronExpression('* * 13 * fri');
 $when = $expression->getNext();
 ```
 
-#### Recommended versions
+## Supported PHP Versions
 
 | cron  | PHP       | Note        |
 | ----- | --------- | ----------- |
@@ -63,7 +63,7 @@ $when = $expression->getNext();
 | 2.4.* | 7.4 - 8.2 |             |
 | 3.0.* | 7.4 - 8.2 |             |
 
-#### Changelog
+## Changelog
 
 | version | release notes |
 | ------- | ------------- |
