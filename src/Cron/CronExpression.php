@@ -375,6 +375,10 @@ class CronExpression
         foreach ($range as $value) {
             $this->validateValue($value, $index);
         }
+
+        if ($range[0] > $range[1]) {
+            throw new Exception('lower value in range is larger than upper value');
+        }
     }
 
     /**
