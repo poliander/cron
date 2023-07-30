@@ -441,7 +441,7 @@ class CronExpression
                         continue;
                     }
 
-                    if (isset($segments[date('w', strtotime(sprintf('%d-%d-%d', $year + $y, $month, $day)))])) {
+                    if (false === isset($segments[date('w', strtotime(sprintf('%d-%d-%d', $year + $y, $month, $day)))])) {
                         continue;
                     }
 
