@@ -1,0 +1,25 @@
+name: CI
+
+on: [push]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: php-actions/composer@v6
+
+      - name: PHPUnit Tests
+        uses: php-actions/phpunit@master
+        with:
+          bootstrap: vendor/autoload.php
+          configuration: phpunit.xml.dist
+          args: --coverage-text
+          php_version: "7.4"
+          php_extensions: "xdebug"
+          coverage_clover: "coverage/clover.xml"
