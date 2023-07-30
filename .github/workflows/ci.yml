@@ -20,6 +20,3 @@ jobs:
           bootstrap: vendor/autoload.php
           configuration: phpunit.xml.dist
           args: --coverage-text
-          php_version: "7.4"
-          php_extensions: "xdebug"
-          coverage_clover: "coverage/clover.xml"
