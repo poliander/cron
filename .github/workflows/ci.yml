@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  run:
+  PHPUnit:
     runs-on: ubuntu-latest
     strategy:
       matrix:
