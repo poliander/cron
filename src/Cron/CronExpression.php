@@ -258,6 +258,8 @@ class CronExpression
                 $this->parseSegment($registers[$index], $index, $segment);
             }
 
+            $this->validateDate($registers);
+
             if (isset($registers[4][7])) {
                 $registers[4][0] = true;
             }
@@ -414,5 +416,32 @@ class CronExpression
         if ((int)$segments[1] < 1 || (int)$segments[1] > self::VALUE_BOUNDARIES[$index]['max']) {
             throw new Exception('stepping out of allowed range');
         }
+    }
+
+    /**
+     * @param array $segments
+     * @throws Exception
+     */
+    private function validateDate(array $segments): void
+    {
+        $year = date('Y');
+
+        for ($y = 0; $y < 27; $y++) {
+            foreach (array_keys($segments[3]) as $month) {
+                foreach (array_keys($segments[2]) as $day) {
+                    if (false === checkdate($month, $day, $year + $y)) {
+                        continue;
+                    }
+
+                    if (isset($segments[date('w', strtotime(sprintf('%d-%d-%d', $year + $y, $month, $day)))])) {
+                        continue;
+                    }
+
+                    return;
+                }
+            }
+        }
+
+        throw new Exception('no date ever can match the given combination of day/month/weekday');
     }
 }
