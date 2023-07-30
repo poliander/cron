@@ -360,10 +360,6 @@ class CronExpression
         $boundary = self::VALUE_BOUNDARIES[$index]['max'] + self::VALUE_BOUNDARIES[$index]['mod'];
         $length = $range[1] - $range[0];
 
-        if ($range[0] > $range[1]) {
-            $length += $boundary;
-        }
-
         for ($i = 0; $i <= $length; $i += $stepping) {
             $register[($range[0] + $i) % $boundary] = true;
         }
