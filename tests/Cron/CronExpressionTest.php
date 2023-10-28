@@ -38,6 +38,7 @@ class CronExpressionTest extends TestCase
         return [
             ["* * * * *",                      true, 'now', true],
             [" *\t    *\t* *  * \t  ",         true, 'now', true],
+            ["* 02,06-19 * * *",               true, '2023-10-28 06:05', true],
             ["1 0 * * *",                      true, '2017-05-26 00:01', true],
             ["0 * * * *",                      true, '2013-02-13 12:00', true],
             ["* * 1 * *",                      true, '2013-03-01 21:43', true],
