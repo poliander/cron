@@ -387,7 +387,7 @@ class CronExpression
      */
     private function validateValue(string $value, int $index, int $step = 1): void
     {
-        if ((string)$value !== (string)(int)$value) {
+        if (false === ctype_digit($value)) {
             throw new Exception('non-integer value');
         }
 
