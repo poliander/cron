@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2']
+        php-version: ['8.1', '8.2', '8.3']
 
     steps:
       - uses: actions/checkout@v3
@@ -17,7 +17,7 @@ jobs:
       - name: PHPUnit Tests
         uses: php-actions/phpunit@master
         with:
-          version: 9.6
+          version: 10
           bootstrap: vendor/autoload.php
           configuration: phpunit.xml.dist
           args: --coverage-text

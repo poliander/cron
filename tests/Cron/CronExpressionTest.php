@@ -33,7 +33,7 @@ class CronExpressionTest extends TestCase
     /**
      * @return array
      */
-    public function parserTestProvider()
+    public static function parserTestProvider()
     {
         return [
             ["* * * * *",                      true, 'now', true],
@@ -163,7 +163,7 @@ class CronExpressionTest extends TestCase
     /**
      * @return array
      */
-    public function getNextProvider()
+    public static function getNextProvider()
     {
         return [
             ['* * 13 * fri', 1400407467, 1402610400],
