@@ -26,8 +26,4 @@ jobs:
         uses: php-actions/composer@v6
 
       - name: Run unit tests
-        uses: php-actions/phpunit@master
-        with:
-          version: 10
-          bootstrap: vendor/autoload.php
-          configuration: phpunit.xml.dist
+        run: vendor/bin/phpunit
