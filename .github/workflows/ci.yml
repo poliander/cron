@@ -11,14 +11,19 @@ jobs:
           - '8.1'
           - '8.2'
           - '8.3'
-        coverage-driver:
-          - pcov
-          - xdebug3
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - uses: php-actions/composer@v6
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: none
+
+      - name: Install dependencies
+        uses: php-actions/composer@v6
 
       - name: PHPUnit Tests
         uses: php-actions/phpunit@master
@@ -26,4 +31,3 @@ jobs:
           version: 10
           bootstrap: vendor/autoload.php
           configuration: phpunit.xml.dist
-          args: --coverage-text
