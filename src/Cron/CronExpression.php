@@ -77,20 +77,19 @@ class CronExpression
     ];
 
     /**
-     * Time zone
-     *
      * @var DateTimeZone|null
      */
-    protected $timeZone = null;
+    protected readonly ?DateTimeZone $timeZone;
 
     /**
-     * Matching registers
-     *
      * @var array|null
      */
-    protected $registers = null;
+    protected readonly ?array $registers;
 
-    protected $expression;
+    /**
+     * @var string
+     */
+    protected readonly string $expression;
 
     /**
      * @param string $expression a cron expression, e.g. "* * * * *"
