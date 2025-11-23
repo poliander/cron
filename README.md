@@ -73,6 +73,7 @@ $when = $expression->getNext();
 | 3.0.* | 7.4 - 8.2 | end of life |
 | 3.1.* | 8.1 - 8.3 | end of life |
 | 3.2.* | 8.2 - 8.4 |             |
+| 3.3.* | 8.3 - 8.5 |             |
 
 ## Changelog
 
