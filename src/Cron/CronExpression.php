@@ -257,8 +257,6 @@ class CronExpression
                 $this->parseSegment($registers[$index], $index, $segment);
             }
 
-            $this->validateDate($registers);
-
             if (isset($registers[4][7])) {
                 $registers[4][0] = true;
             }
