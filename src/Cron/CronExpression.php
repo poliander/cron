@@ -432,7 +432,6 @@ class CronExpression
                         continue;
                     }
 
-                    if (false === isset($segments[date('w', strtotime(sprintf('%d-%d-%d', $year + $y, $month, $day)))])) {
                     $weekday = date('w', strtotime(sprintf('%d-%d-%d', $year + $y, $month, $day)));
 
                     if (false === isset($segments[4][$weekday])) {
