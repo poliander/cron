@@ -257,11 +257,11 @@ class CronExpression
                 $this->parseSegment($registers[$index], $index, $segment);
             }
 
-            $this->validateDate($registers);
-
             if (isset($registers[4][7])) {
                 $registers[4][0] = true;
             }
+
+            $this->validateDate($registers);
 
             return $registers;
         }
@@ -432,7 +432,9 @@ class CronExpression
                         continue;
                     }
 
-                    if (false === isset($segments[date('w', strtotime(sprintf('%d-%d-%d', $year + $y, $month, $day)))])) {
+                    $weekday = date('w', strtotime(sprintf('%d-%d-%d', $year + $y, $month, $day)));
+
+                    if (false === isset($segments[4][$weekday])) {
                         continue;
                     }
 
