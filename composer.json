@@ -1,6 +1,6 @@
 {
   "name": "poliander/cron",
-  "version": "3.4.0",
+  "version": "dev-main",
   "description": "Standard (V7) compliant crontab expression parser/validator with support for time zones",
   "type": "library",
   "homepage": "https://github.com/poliander/cron",
