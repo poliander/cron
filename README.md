@@ -114,4 +114,4 @@ $when = $expression->getNext();
 | 3.2.2 (2026-03-05) | fixed #30 |
 | 3.3.0 (2025-11-23) | added PHP 8.5 support, dropped PHP 8.2 support |
 | 3.3.1 (2026-03-05) | fixed #30 |
-| 3.4.0 (2026-11-19) | added PHP 8.6 support, dropped PHP 8.3 support |
+| 3.4.0 (2026-11-19) | added PHP 8.6 support, dropped PHP 8.3 support, updated PHPUnit to 12.* |
