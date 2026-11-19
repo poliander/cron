@@ -127,7 +127,7 @@ class CronExpression
     public function isMatching($when = null): bool
     {
         if (false === ($when instanceof DateTimeInterface)) {
-            $when = (new DateTime())->setTimestamp($when === null ? time() : $when);
+            $when = new DateTime()->setTimestamp($when === null ? time() : $when);
         }
 
         if ($this->timeZone !== null) {
@@ -230,13 +230,7 @@ class CronExpression
      */
     private function match(array $segments): bool
     {
-        foreach ($this->registers as $i => $item) {
-            if (isset($item[(int)$segments[$i]]) === false) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($this->registers, fn($item, $i) => isset($item[(int)$segments[$i]]));
     }
 
     /**
