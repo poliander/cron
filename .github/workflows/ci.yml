@@ -27,6 +27,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php-version }}
+          php_extensions: mbstring
 
       - name: Run unit tests
         run: vendor/bin/phpunit
