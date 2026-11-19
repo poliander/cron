@@ -2,6 +2,7 @@
 
 namespace Poliander\Cron;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 use DateTime;
@@ -14,13 +15,7 @@ use DateTimeZone;
  */
 class CronExpressionTest extends TestCase
 {
-    /**
-     * @param string $expression
-     * @param bool $valid
-     * @param string $when
-     * @param bool $matching
-     * @dataProvider parserTestProvider
-     */
+    #[DataProvider('parserTestProvider')]
     public function testParser(string $expression, bool $valid = false, string $when = 'now', bool $matching = false)
     {
         $which = new CronExpression($expression, new DateTimeZone('Europe/Berlin'));
@@ -148,12 +143,7 @@ class CronExpressionTest extends TestCase
         $this->assertEquals(false, $what->getNext(1649750400));
     }
 
-    /**
-     * @param string $expression
-     * @param int $timestampCurrent
-     * @param int $timestampNext
-     * @dataProvider getNextProvider
-     */
+    #[DataProvider('getNextProvider')]
     public function testGetNext(string $expression, int $timestampCurrent, int $timestampNext)
     {
         $what = new CronExpression($expression, new DateTimeZone('Europe/Berlin'));

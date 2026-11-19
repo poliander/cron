@@ -6,8 +6,9 @@ checks:
   php: true
 
 build:
+  image: default-jammy
   environment:
-    php: 8.3.28
+    php: 8.4.27
     postgresql: false
     redis: false
     variables:

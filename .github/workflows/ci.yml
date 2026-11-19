@@ -8,9 +8,9 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - '8.3'
           - '8.4'
           - '8.5'
+          - '8.6'
 
     steps:
       - name: Checkout
@@ -20,12 +20,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
+          extensions: mbstring
           tools: none
 
       - name: Install dependencies
         uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php-version }}
+          php_extensions: mbstring
 
       - name: Run unit tests
         run: vendor/bin/phpunit
